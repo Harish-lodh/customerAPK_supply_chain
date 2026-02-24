@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../core/services/api_service.dart';
 import '../core/services/secure_storage_service.dart';
-import '../core/constants/app_constants.dart';
+import '../core/services/session_service.dart';
 import '../models/auth_models.dart';
 
 enum AuthState {
@@ -20,6 +21,7 @@ class AuthProvider extends ChangeNotifier {
   User? _user;
   String? _errorMessage;
   bool _isOtpSent = false;
+  String? _pendingMobileNumber;
   
   AuthProvider({
     required this.apiService,
@@ -34,24 +36,27 @@ class AuthProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get isOtpSent => _isOtpSent;
   bool get isAuthenticated => _state == AuthState.authenticated;
+  String? get pendingMobileNumber => _pendingMobileNumber;
   
   // Check if user is already logged in
   Future<void> _checkAuthStatus() async {
     try {
-      final isLoggedIn = await secureStorage.isLoggedIn();
-      final token = await secureStorage.getAccessToken();
+      // Use SessionService for checking login status
+      final isLoggedIn = await SessionService.isLoggedIn();
       
-      if (isLoggedIn && token != null) {
+      if (isLoggedIn) {
         _state = AuthState.authenticated;
-        // Load user data from storage
-        final userData = await secureStorage.getUserData();
-        if (userData != null) {
-          // Parse user data - in real app, parse from JSON
+        // Load user data from SessionService
+        final customerId = await SessionService.getCustomerId();
+        final customerName = await SessionService.getCustomerName();
+        final companyName = await SessionService.getCompanyName();
+        
+        if (customerId != null && customerName != null && companyName != null) {
           _user = User(
-            id: '1',
-            mobileNumber: '+91 9876543210',
-            companyName: 'ABC Traders Pvt Ltd',
-            email: 'contact@abctraders.com',
+            id: customerId.toString(),
+            mobileNumber: '',
+            companyName: companyName,
+            email: '',
             createdAt: DateTime.now(),
           );
         }
@@ -64,26 +69,30 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
   
-  // Login with OTP
-  Future<bool> sendOtp(String mobileNumber) async {
+  // Request OTP for login
+  Future<bool> requestOtp(String mobileNumber) async {
     _state = AuthState.loading;
     _errorMessage = null;
     notifyListeners();
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await apiService.post(
+        '/customers/login/otp',
+        data: {'mobile': mobileNumber},
+      );
       
-      // In real app, call API
-      // final response = await apiService.post(
-      //   AppConstants.otpEndpoint,
-      //   data: {'mobile_number': mobileNumber},
-      // );
-      
-      _isOtpSent = true;
-      _state = AuthState.unauthenticated;
-      notifyListeners();
-      return true;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _isOtpSent = true;
+        _pendingMobileNumber = mobileNumber;
+        _state = AuthState.unauthenticated;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.data?['message'] ?? 'Failed to send OTP';
+        _state = AuthState.error;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
       _errorMessage = 'Failed to send OTP. Please try again.';
       _state = AuthState.error;
@@ -92,6 +101,9 @@ class AuthProvider extends ChangeNotifier {
     }
   }
   
+  // Send OTP (alias for requestOtp)
+  Future<bool> sendOtp(String mobileNumber) => requestOtp(mobileNumber);
+  
   // Verify OTP and Login
   Future<bool> verifyOtpAndLogin(String mobileNumber, String otp) async {
     _state = AuthState.loading;
@@ -99,34 +111,63 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // Mock successful response
-      final response = AuthResponse(
-        accessToken: 'mock_access_token_${DateTime.now().millisecondsSinceEpoch}',
-        refreshToken: 'mock_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
-        user: User(
-          id: '1',
-          mobileNumber: mobileNumber,
-          companyName: 'ABC Traders Pvt Ltd',
-          email: 'contact@abctraders.com',
-          panNumber: 'AABCU9600R1ZN',
-          gstNumber: '29AABCU9600R1ZN',
-          createdAt: DateTime.now(),
-        ),
+      final response = await apiService.post(
+        '/customers/login/otp/verify',
+        data: {
+          'mobile': mobileNumber,
+          'otp': otp,
+        },
       );
       
-      // Save tokens
-      await secureStorage.setAccessToken(response.accessToken);
-      await secureStorage.setRefreshToken(response.refreshToken);
-      await secureStorage.setUserData(response.user.toJson().toString());
-      await secureStorage.setIsLoggedIn(true);
-      
-      _user = response.user;
-      _state = AuthState.authenticated;
-      notifyListeners();
-      return true;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Try new backend format first, fall back to old format
+        if (response.data['success'] == true && response.data['token'] != null) {
+          // New backend format
+          final loginResponse = LoginResponse.fromJson(response.data);
+          
+          // Save session using SessionService
+          await SessionService.saveSession(
+            token: loginResponse.token,
+            customerId: loginResponse.customer?.id ?? 0,
+            name: loginResponse.customer?.name ?? '',
+            companyName: loginResponse.customer?.companyName ?? '',
+          );
+          
+          _user = User(
+            id: loginResponse.customer?.id.toString() ?? '',
+            mobileNumber: loginResponse.customer?.mobile ?? '',
+            companyName: loginResponse.customer?.companyName ?? '',
+            email: '',
+            createdAt: DateTime.now(),
+          );
+        } else {
+          // Old backend format
+          final authResponse = AuthResponse.fromJson(response.data);
+          
+          // Store token in SharedPreferences (key: "auth_token")
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('auth_token', authResponse.accessToken);
+          
+          // Also store in secure storage for other uses
+          await secureStorage.setAccessToken(authResponse.accessToken);
+          await secureStorage.setRefreshToken(authResponse.refreshToken);
+          await secureStorage.setUserData(authResponse.user.toJson().toString());
+          await secureStorage.setIsLoggedIn(true);
+          
+          _user = authResponse.user;
+        }
+        
+        _state = AuthState.authenticated;
+        _isOtpSent = false;
+        _pendingMobileNumber = null;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.data?['message'] ?? 'Invalid OTP';
+        _state = AuthState.error;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
       _errorMessage = 'Invalid OTP. Please try again.';
       _state = AuthState.error;
@@ -142,34 +183,96 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // Mock successful response
-      final response = AuthResponse(
-        accessToken: 'mock_access_token_${DateTime.now().millisecondsSinceEpoch}',
-        refreshToken: 'mock_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
-        user: User(
-          id: '1',
-          mobileNumber: mobileNumber,
-          companyName: 'ABC Traders Pvt Ltd',
-          email: 'contact@abctraders.com',
-          createdAt: DateTime.now(),
-        ),
+      final response = await apiService.post(
+        '/customers/login',
+        data: {
+          'mobile': mobileNumber,
+          'password': password,
+        },
       );
       
-      // Save tokens
-      await secureStorage.setAccessToken(response.accessToken);
-      await secureStorage.setRefreshToken(response.refreshToken);
-      await secureStorage.setUserData(response.user.toJson().toString());
-      await secureStorage.setIsLoggedIn(true);
-      
-      _user = response.user;
-      _state = AuthState.authenticated;
-      notifyListeners();
-      return true;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Try new backend format first, fall back to old format
+        if (response.data['success'] == true && response.data['token'] != null) {
+          // New backend format
+          final loginResponse = LoginResponse.fromJson(response.data);
+          
+          // Save session using SessionService
+          await SessionService.saveSession(
+            token: loginResponse.token,
+            customerId: loginResponse.customer?.id ?? 0,
+            name: loginResponse.customer?.name ?? '',
+            companyName: loginResponse.customer?.companyName ?? '',
+          );
+          
+          _user = User(
+            id: loginResponse.customer?.id.toString() ?? '',
+            mobileNumber: loginResponse.customer?.mobile ?? '',
+            companyName: loginResponse.customer?.companyName ?? '',
+            email: '',
+            createdAt: DateTime.now(),
+          );
+        } else {
+          // Old backend format
+          final authResponse = AuthResponse.fromJson(response.data);
+          
+          // Store token in SharedPreferences (key: "auth_token")
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('auth_token', authResponse.accessToken);
+          
+          // Also store in secure storage for other uses
+          await secureStorage.setAccessToken(authResponse.accessToken);
+          await secureStorage.setRefreshToken(authResponse.refreshToken);
+          await secureStorage.setUserData(authResponse.user.toJson().toString());
+          await secureStorage.setIsLoggedIn(true);
+          
+          _user = authResponse.user;
+        }
+        
+        _state = AuthState.authenticated;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.data?['message'] ?? 'Invalid credentials';
+        _state = AuthState.error;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
       _errorMessage = 'Invalid credentials. Please try again.';
+      _state = AuthState.error;
+      notifyListeners();
+      return false;
+    }
+  }
+  
+  // Set or update password
+  Future<bool> setPassword(String mobileNumber, String password) async {
+    _state = AuthState.loading;
+    _errorMessage = null;
+    notifyListeners();
+    
+    try {
+      final response = await apiService.post(
+        '/customers/password',
+        data: {
+          'mobile': mobileNumber,
+          'password': password,
+        },
+      );
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _state = AuthState.unauthenticated;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.data?['message'] ?? 'Failed to set password';
+        _state = AuthState.error;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to set password. Please try again.';
       _state = AuthState.error;
       notifyListeners();
       return false;
@@ -182,18 +285,26 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Call logout API
-      // await apiService.post(AppConstants.logoutEndpoint);
+      // Clear session using SessionService
+      await SessionService.clearSession();
       
-      // Clear local storage
+      // Also clear SharedPreferences token for backward compatibility
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('auth_token');
+      
+      // Clear secure storage
       await secureStorage.clearAll();
       
       _user = null;
       _state = AuthState.unauthenticated;
       _isOtpSent = false;
+      _pendingMobileNumber = null;
     } catch (e) {
       // Even if API fails, clear local storage
+      await SessionService.clearSession();
       await secureStorage.clearAll();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('auth_token');
       _user = null;
       _state = AuthState.unauthenticated;
     }
@@ -210,6 +321,7 @@ class AuthProvider extends ChangeNotifier {
   // Reset OTP
   void resetOtp() {
     _isOtpSent = false;
+    _pendingMobileNumber = null;
     notifyListeners();
   }
 }

@@ -19,7 +19,7 @@ class AppConstants {
   static const String loanScheduleEndpoint = '/loans/schedule';
   static const String transactionsEndpoint = '/transactions';
   static const String notificationsEndpoint = '/notifications';
-  static const String profileEndpoint = '/profile';
+  static const String profileEndpoint = '/customerDetails';
   static const String bankDetailsEndpoint = '/profile/bank-details';
   
   // Storage Keys

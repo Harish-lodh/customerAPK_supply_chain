@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../constants/app_constants.dart';
 import 'secure_storage_service.dart';
+import 'session_service.dart';
 
 class ApiService {
   late Dio _dio;
@@ -13,9 +15,12 @@ class ApiService {
   }
   
   void _initDio() {
+    // Read base URL from dotenv
+    final baseUrl = dotenv.env['BASE_URL'] ?? '';
+    
     _dio = Dio(
       BaseOptions(
-        baseUrl: AppConstants.baseUrl,
+        baseUrl: baseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         headers: {
@@ -127,14 +132,15 @@ class _AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Skip auth for login/refresh endpoints
-    if (options.path.contains('/auth/login') ||
-        options.path.contains('/auth/refresh') ||
-        options.path.contains('/auth/otp')) {
+    // Skip auth for login/otp endpoints
+    if (options.path.contains('/customers/login') ||
+        options.path.contains('/customers/password')) {
       return handler.next(options);
     }
     
-    final token = await secureStorage.getAccessToken();
+    // Get token from SessionService
+    final token = await SessionService.getToken();
+    
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
     }
@@ -167,6 +173,9 @@ class _AuthInterceptor extends Interceptor {
               await secureStorage.setAccessToken(newAccessToken);
               await secureStorage.setRefreshToken(newRefreshToken);
               
+              // Also update token in SessionService
+              await SessionService.updateToken(newAccessToken);
+              
               // Retry the original request
               final options = err.requestOptions;
               options.headers['Authorization'] = 'Bearer $newAccessToken';
@@ -180,6 +189,7 @@ class _AuthInterceptor extends Interceptor {
           apiService.isRefreshing = false;
           // Refresh failed, clear tokens and notify
           await secureStorage.clearAll();
+          await SessionService.clearSession();
         }
       }
     }

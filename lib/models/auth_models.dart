@@ -42,6 +42,62 @@ class User {
   }
 }
 
+/// Customer model for backend login response
+class Customer {
+  final int id;
+  final String name;
+  final String companyName;
+  final String mobile;
+  
+  Customer({
+    required this.id,
+    required this.name,
+    required this.companyName,
+    required this.mobile,
+  });
+  
+  factory Customer.fromJson(Map<String, dynamic> json) {
+    return Customer(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      companyName: json['companyName'] ?? json['company_name'] ?? '',
+      mobile: json['mobile'] ?? '',
+    );
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'companyName': companyName,
+      'mobile': mobile,
+    };
+  }
+}
+
+/// Backend login response model
+class LoginResponse {
+  final bool success;
+  final String token;
+  final Customer? customer;
+  
+  LoginResponse({
+    required this.success,
+    required this.token,
+    this.customer,
+  });
+  
+  factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    return LoginResponse(
+      success: json['success'] ?? false,
+      token: json['token'] ?? '',
+      customer: json['customer'] != null 
+          ? Customer.fromJson(json['customer']) 
+          : null,
+    );
+  }
+}
+
 class AuthResponse {
   final String accessToken;
   final String refreshToken;

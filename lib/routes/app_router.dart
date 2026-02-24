@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import '../features/auth/screens/login_screen.dart';
+import '../features/auth/screens/otp_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
 import '../features/drawdown/screens/drawdown_list_screen.dart';
 import '../features/drawdown/screens/drawdown_form_screen.dart';
@@ -26,6 +27,12 @@ class AppRouter {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final isLoggedIn = authProvider.isAuthenticated;
       final isLoggingIn = state.uri.path == '/login';
+      final isOtpRoute = state.uri.path == '/otp';
+      
+      // Allow OTP route only when coming from login
+      if (isOtpRoute) {
+        return null;
+      }
       
       if (!isLoggedIn && !isLoggingIn) {
         return '/login';
@@ -42,6 +49,16 @@ class AppRouter {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      
+      // OTP Verification Route
+      GoRoute(
+        path: '/otp',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final mobile = extra?['mobile'] as String? ?? '';
+          return OtpScreen(mobileNumber: mobile);
+        },
       ),
       
       // Main App Shell with Bottom Navigation
