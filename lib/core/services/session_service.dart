@@ -14,6 +14,7 @@ class SessionService {
   static const String _keyCustomerName = 'customerName';
   static const String _keyCompanyName = 'companyName';
   static const String _keyIsLoggedIn = 'isLoggedIn';
+  static const String _keyPartnerLanId = 'partnerLanId';
 
   // FlutterSecureStorage instance for mobile platforms
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage(
@@ -31,11 +32,13 @@ class SessionService {
   /// [customerId] - Customer ID from backend
   /// [name] - Customer name
   /// [companyName] - Company name
+  /// [partnerLanId] - Partner LAN ID from backend (optional)
   static Future<void> saveSession({
     required String token,
     required int customerId,
     required String name,
     required String companyName,
+    String? partnerLanId,
   }) async {
     if (kIsWeb) {
       // Web: Use localStorage
@@ -44,6 +47,9 @@ class SessionService {
       _WebStorageHelper.setItem(_keyCustomerName, name);
       _WebStorageHelper.setItem(_keyCompanyName, companyName);
       _WebStorageHelper.setItem(_keyIsLoggedIn, 'true');
+      if (partnerLanId != null) {
+        _WebStorageHelper.setItem(_keyPartnerLanId, partnerLanId);
+      }
     } else {
       // Mobile: Use flutter_secure_storage
       await _secureStorage.write(key: _keyToken, value: token);
@@ -51,6 +57,9 @@ class SessionService {
       await _secureStorage.write(key: _keyCustomerName, value: name);
       await _secureStorage.write(key: _keyCompanyName, value: companyName);
       await _secureStorage.write(key: _keyIsLoggedIn, value: 'true');
+      if (partnerLanId != null) {
+        await _secureStorage.write(key: _keyPartnerLanId, value: partnerLanId);
+      }
     }
   }
 
@@ -96,6 +105,16 @@ class SessionService {
     }
   }
 
+  /// Get the stored partner LAN ID
+  /// Returns null if not available
+  static Future<String?> getPartnerLanId() async {
+    if (kIsWeb) {
+      return _WebStorageHelper.getItem(_keyPartnerLanId);
+    } else {
+      return await _secureStorage.read(key: _keyPartnerLanId);
+    }
+  }
+
   /// Check if user is logged in
   /// Returns true if session exists and token is valid
   static Future<bool> isLoggedIn() async {
@@ -119,6 +138,7 @@ class SessionService {
       _WebStorageHelper.removeItem(_keyCustomerName);
       _WebStorageHelper.removeItem(_keyCompanyName);
       _WebStorageHelper.removeItem(_keyIsLoggedIn);
+      _WebStorageHelper.removeItem(_keyPartnerLanId);
     } else {
       // Mobile: Delete from secure storage
       await _secureStorage.delete(key: _keyToken);
@@ -126,6 +146,7 @@ class SessionService {
       await _secureStorage.delete(key: _keyCustomerName);
       await _secureStorage.delete(key: _keyCompanyName);
       await _secureStorage.delete(key: _keyIsLoggedIn);
+      await _secureStorage.delete(key: _keyPartnerLanId);
     }
   }
 

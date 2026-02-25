@@ -78,6 +78,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _buildQuickStats(dashboard),
                   const SizedBox(height: 24),
                   
+                  // Total Loans and Disbursed
+                  _buildLoanSummary(dashboard),
+                  const SizedBox(height: 24),
+                  
+                  // Recent Repayments
+                  if (dashboard.recentRepayments.isNotEmpty) ...[
+                    Text(
+                      'Recent Repayments',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildRecentRepayments(dashboard),
+                    const SizedBox(height: 24),
+                  ],
+                  
                   // Quick Actions
                   Text(
                     'Quick Actions',
@@ -238,6 +253,120 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildLoanSummary(Dashboard dashboard) {
+    final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
+    
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Loan Summary',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildSummaryItem(
+                    'Total Loans',
+                    dashboard.totalLoans.toString(),
+                    Icons.assignment,
+                    AppColors.primaryBlue,
+                  ),
+                ),
+                Expanded(
+                  child: _buildSummaryItem(
+                    'Total Disbursed',
+                    currencyFormat.format(dashboard.totalDisbursed),
+                    Icons.payments,
+                    AppColors.success,
+                  ),
+                ),
+                Expanded(
+                  child: _buildSummaryItem(
+                    'Outstanding',
+                    currencyFormat.format(dashboard.totalOutstanding),
+                    Icons.account_balance_wallet,
+                    AppColors.warning,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(String title, String value, IconData icon, Color color) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 28),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          title,
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 11,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecentRepayments(Dashboard dashboard) {
+    final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 2);
+    final dateFormat = DateFormat('dd MMM yyyy');
+    
+    return Card(
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: dashboard.recentRepayments.length,
+        separatorBuilder: (context, index) => const Divider(height: 1),
+        itemBuilder: (context, index) {
+          final repayment = dashboard.recentRepayments[index];
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundColor: AppColors.success.withOpacity(0.1),
+              child: const Icon(Icons.check_circle, color: AppColors.success),
+            ),
+            title: Text(
+              'LAN: ${repayment.lan}',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              dateFormat.format(repayment.collectionDate),
+              style: const TextStyle(color: AppColors.textSecondary),
+            ),
+            trailing: Text(
+              currencyFormat.format(repayment.collectionAmount),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.success,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 

@@ -17,10 +17,20 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<LoansProvider>(context, listen: false);
-      provider.loadLoans();
-      provider.loadEmiSchedule(widget.loanId);
+      _loadData();
     });
+  }
+
+  Future<void> _loadData() async {
+    final provider = Provider.of<LoansProvider>(context, listen: false);
+    
+    // Load loans if not already loaded
+    if (provider.loans.isEmpty) {
+      await provider.loadLoans();
+    }
+    
+    // Now load the EMI schedule with the LAN
+    provider.loadEmiSchedule(widget.loanId);
   }
 
   @override

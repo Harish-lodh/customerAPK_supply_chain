@@ -131,6 +131,7 @@ class AuthProvider extends ChangeNotifier {
             customerId: loginResponse.customer?.id ?? 0,
             name: loginResponse.customer?.name ?? '',
             companyName: loginResponse.customer?.companyName ?? '',
+            partnerLanId: loginResponse.partnerLanId,
           );
           
           _user = User(
@@ -203,6 +204,7 @@ class AuthProvider extends ChangeNotifier {
             customerId: loginResponse.customer?.id ?? 0,
             name: loginResponse.customer?.name ?? '',
             companyName: loginResponse.customer?.companyName ?? '',
+            partnerLanId: loginResponse.partnerLanId,
           );
           
           _user = User(
@@ -283,6 +285,13 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     _state = AuthState.loading;
     notifyListeners();
+    
+    try {
+      // Call logout API
+      await apiService.logout();
+    } catch (_) {
+      // Continue with local logout even if API fails
+    }
     
     try {
       // Clear session using SessionService

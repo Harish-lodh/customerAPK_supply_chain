@@ -79,11 +79,13 @@ class Customer {
 class LoginResponse {
   final bool success;
   final String token;
+  final String? partnerLanId;
   final Customer? customer;
   
   LoginResponse({
     required this.success,
     required this.token,
+    this.partnerLanId,
     this.customer,
   });
   
@@ -91,10 +93,20 @@ class LoginResponse {
     return LoginResponse(
       success: json['success'] ?? false,
       token: json['token'] ?? '',
+      partnerLanId: json['partnerLanId'],
       customer: json['customer'] != null 
           ? Customer.fromJson(json['customer']) 
           : null,
     );
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'token': token,
+      'partnerLanId': partnerLanId,
+      'customer': customer?.toJson(),
+    };
   }
 }
 

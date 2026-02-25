@@ -77,17 +77,31 @@ class _LoansScreenState extends State<LoansScreen> {
               Row(
                 children: [
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('Outstanding', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-                    Text(currencyFormat.format(loan.outstandingAmount), style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('Sanction Amount', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    Text(currencyFormat.format(loan.sanctionedAmount), style: const TextStyle(fontWeight: FontWeight.bold)),
                   ])),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('EMI', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-                    Text(currencyFormat.format(loan.emiAmount), style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('Available', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    Text(currencyFormat.format(loan.outstandingAmount), style: const TextStyle(fontWeight: FontWeight.bold)),
                   ])),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Text('Rate', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
                     Text('${loan.interestRate}%', style: const TextStyle(fontWeight: FontWeight.bold)),
                   ])),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Text('Tenure', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    Text('${loan.tenureMonths} Months', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ])),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Text('Utilized', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    Text(currencyFormat.format(loan.utilizedAmount), style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ])),
+                  const Expanded(child: SizedBox()),
                 ],
               ),
             ],

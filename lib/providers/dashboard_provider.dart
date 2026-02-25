@@ -30,12 +30,15 @@ class DashboardProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await apiService.getDashboard();
       
-      // Mock data
-      _dashboard = Dashboard.mock();
-      _state = DashboardState.loaded;
+      if (response.statusCode == 200 && response.data != null) {
+        _dashboard = Dashboard.fromJson(response.data);
+        _state = DashboardState.loaded;
+      } else {
+        _errorMessage = 'Failed to load dashboard';
+        _state = DashboardState.error;
+      }
     } catch (e) {
       _errorMessage = 'Failed to load dashboard. Please try again.';
       _state = DashboardState.error;

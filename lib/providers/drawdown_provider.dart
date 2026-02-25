@@ -40,17 +40,16 @@ class DrawdownProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await apiService.getDrawdownList();
       
-      // Mock data
-      _drawdownRequests = [
-        DrawdownRequest.mock(1),
-        DrawdownRequest.mock(2),
-        DrawdownRequest.mock(3),
-        DrawdownRequest.mock(4),
-      ];
-      _state = DrawdownState.loaded;
+      if (response.statusCode == 200 && response.data != null) {
+        final List<dynamic> data = response.data['drawdowns'] ?? response.data;
+        _drawdownRequests = data.map((json) => DrawdownRequest.fromJson(json)).toList();
+        _state = DrawdownState.loaded;
+      } else {
+        _errorMessage = 'Failed to load drawdown requests.';
+        _state = DrawdownState.error;
+      }
     } catch (e) {
       _errorMessage = 'Failed to load drawdown requests.';
       _state = DrawdownState.error;
@@ -110,16 +109,26 @@ class DrawdownProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      final body = {
+        'invoice_id': invoiceId,
+        'dealer_id': dealerId,
+        'amount': amount,
+      };
       
-      // Mock success
-      _successMessage = 'Drawdown request submitted successfully!';
-      _state = DrawdownState.success;
+      final response = await apiService.submitDrawdown(body);
       
-      // Reload requests
-      await loadDrawdownRequests();
-      return true;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _successMessage = 'Drawdown request submitted successfully!';
+        _state = DrawdownState.success;
+        
+        // Reload requests
+        await loadDrawdownRequests();
+        return true;
+      } else {
+        _errorMessage = response.data?['message'] ?? 'Failed to submit drawdown request.';
+        _state = DrawdownState.error;
+        return false;
+      }
     } catch (e) {
       _errorMessage = 'Failed to submit drawdown request.';
       _state = DrawdownState.error;

@@ -116,6 +116,138 @@ class ApiService {
       onReceiveProgress: onReceiveProgress,
     );
   }
+
+  // ============================================
+  // API ENDPOINTS
+  // ============================================
+
+  /// Get dashboard data
+  /// GET /dashboard
+  Future<Response> getDashboard() async {
+    return await get(AppConstants.dashboardEndpoint);
+  }
+
+  /// Get drawdown list
+  /// GET /drawdown/list
+  Future<Response> getDrawdownList() async {
+    return await get(AppConstants.drawdownListEndpoint);
+  }
+
+  /// Submit a new drawdown request
+  /// POST /drawdown
+  Future<Response> submitDrawdown(Map<String, dynamic> body) async {
+    return await post(AppConstants.drawdownEndpoint, data: body);
+  }
+
+  /// Get all loans
+  /// GET /loans
+  Future<Response> getLoans() async {
+    return await get(AppConstants.loansEndpoint);
+  }
+
+  /// Get loan details by loan ID
+  /// GET /loans/detail?loanId={loanId}
+  Future<Response> getLoanDetail(String loanId) async {
+    return await get(
+      AppConstants.loanDetailEndpoint,
+      queryParameters: {'loanId': loanId},
+    );
+  }
+
+  /// Get loan repayment schedule
+  /// GET /loans/schedule?loanId={loanId}
+  Future<Response> getLoanSchedule(String loanId) async {
+    return await get(
+      AppConstants.loanScheduleEndpoint,
+      queryParameters: {'lan': loanId},
+    );
+  }
+
+  /// Get loan statement for a date range
+  /// GET /loans/statement?loanId={loanId}&fromDate={fromDate}&toDate={toDate}
+  Future<Response> getLoanStatement(
+    String loanId,
+    String fromDate,
+    String toDate,
+  ) async {
+    return await get(
+      AppConstants.loanStatementEndpoint,
+      queryParameters: {
+        'loanId': loanId,
+        'fromDate': fromDate,
+        'toDate': toDate,
+      },
+    );
+  }
+
+  /// Get foreclosure preview for a loan
+  /// GET /loans/foreclosure-preview?loanId={loanId}
+  Future<Response> getForeclosurePreview(String loanId) async {
+    return await get(
+      AppConstants.loanForeclosurePreviewEndpoint,
+      queryParameters: {'loanId': loanId},
+    );
+  }
+
+  /// Get paginated transactions
+  /// GET /transactions?page={page}&pageSize={pageSize}
+  Future<Response> getTransactions(int page, int pageSize) async {
+    return await get(
+      AppConstants.transactionsEndpoint,
+      queryParameters: {
+        'page': page,
+        'pageSize': pageSize,
+      },
+    );
+  }
+
+  /// Get transaction receipt by ID
+  /// GET /transactions/{id}/receipt
+  Future<Response> getTransactionReceipt(String id) async {
+    return await get('${AppConstants.transactionsEndpoint}/$id/receipt');
+  }
+
+  /// Get all notifications
+  /// GET /notifications
+  Future<Response> getNotifications() async {
+    return await get(AppConstants.notificationsEndpoint);
+  }
+
+  /// Mark a notification as read
+  /// PUT /notifications/{id}/read
+  Future<Response> markNotificationRead(String id) async {
+    return await put('${AppConstants.notificationsEndpoint}/$id/read');
+  }
+
+  /// Mark all notifications as read
+  /// PUT /notifications/read-all
+  Future<Response> markAllNotificationsRead() async {
+    return await put('${AppConstants.notificationsEndpoint}/read-all');
+  }
+
+  /// Get bank details for profile
+  /// GET /profile/bank-details
+  Future<Response> getBankDetails() async {
+    return await get(AppConstants.bankDetailsEndpoint);
+  }
+
+  /// Logout user
+  /// POST /auth/logout
+  Future<Response> logout() async {
+    return await post(AppConstants.logoutEndpoint);
+  }
+
+  /// Refresh access token
+  /// POST /auth/refresh
+  Future<Response> refreshToken(String refreshToken) async {
+    return await post(
+      AppConstants.refreshTokenEndpoint,
+      data: {'refresh_token': refreshToken},
+      options: Options(
+        headers: {'Authorization': ''},
+      ),
+    );
+  }
 }
 
 class _AuthInterceptor extends Interceptor {

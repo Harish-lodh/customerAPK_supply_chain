@@ -36,16 +36,17 @@ class LoansProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await apiService.getLoans();
       
-      // Mock data
-      _loans = [
-        Loan.mock(1),
-        Loan.mock(2),
-        Loan.mock(3),
-      ];
-      _state = LoansState.loaded;
+      if (response.statusCode == 200 && response.data != null) {
+        final Map<String, dynamic> responseData = response.data;
+        final List<dynamic> data = responseData['data'] ?? [];
+        _loans = data.map((json) => Loan.fromJson(json)).toList();
+        _state = LoansState.loaded;
+      } else {
+        _errorMessage = 'Failed to load loans. Please try again.';
+        _state = LoansState.error;
+      }
     } catch (e) {
       _errorMessage = 'Failed to load loans. Please try again.';
       _state = LoansState.error;
@@ -70,12 +71,15 @@ class LoansProvider extends ChangeNotifier {
   // Load Loan EMI Schedule
   Future<void> loadEmiSchedule(String loanId) async {
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Find loan and get schedule
+      // Find the loan by ID and get its LAN (loanNumber)
       final loan = _loans.firstWhere((l) => l.id == loanId);
-      _selectedLoan = loan;
+      final lan = loan.loanNumber; // This is the LAN from the loans API
+      
+      final response = await apiService.getLoanSchedule(lan);
+      
+      if (response.statusCode == 200 && response.data != null) {
+        _selectedLoan = loan;
+      }
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to load EMI schedule.';
@@ -84,23 +88,13 @@ class LoansProvider extends ChangeNotifier {
   }
   
   // Load Loan Statement
-  Future<void> loadLoanStatement(String loanId) async {
+  Future<void> loadLoanStatement(String loanId, String fromDate, String toDate) async {
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await apiService.getLoanStatement(loanId, fromDate, toDate);
       
-      // Mock statement data
-      _loanStatement = LoanStatement(
-        loanId: loanId,
-        loanNumber: 'SCF/2024/001',
-        fromDate: DateTime.now().subtract(const Duration(days: 90)),
-        toDate: DateTime.now(),
-        openingBalance: 3500000,
-        closingBalance: 2800000,
-        totalDisbursement: 500000,
-        totalRepayment: 750000,
-        entries: [],
-      );
+      if (response.statusCode == 200 && response.data != null) {
+        _loanStatement = LoanStatement.fromJson(response.data);
+      }
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to load statement.';
@@ -111,18 +105,11 @@ class LoansProvider extends ChangeNotifier {
   // Get Foreclosure Preview
   Future<void> getForeclosurePreview(String loanId) async {
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await apiService.getForeclosurePreview(loanId);
       
-      // Mock preview data
-      _foreclosurePreview = ForeclosurePreview(
-        loanId: loanId,
-        outstandingPrincipal: 2800000,
-        interestOutstanding: 25000,
-        foreclosureCharges: 28000,
-        gstAmount: 5040,
-        totalForeclosureAmount: 2875040,
-      );
+      if (response.statusCode == 200 && response.data != null) {
+        _foreclosurePreview = ForeclosurePreview.fromJson(response.data);
+      }
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to load foreclosure preview.';

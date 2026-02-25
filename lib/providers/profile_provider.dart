@@ -118,4 +118,28 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> refresh() async {
     await loadProfile();
   }
+  
+  // Load Bank Details from API
+  Future<void> loadBankDetails() async {
+    try {
+      final response = await apiService.getBankDetails();
+      
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data;
+        _bankDetails = BankDetails(
+          id: data['id']?.toString() ?? '',
+          bankName: data['bank_name'] ?? '',
+          branchName: data['branch_name'] ?? '',
+          accountNumber: data['account_number'] ?? '',
+          ifscCode: data['ifsc_code'] ?? '',
+          accountType: data['account_type'] ?? 'Saving',
+          isPrimary: data['is_primary'] ?? true,
+        );
+        notifyListeners();
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to load bank details.';
+      notifyListeners();
+    }
+  }
 }

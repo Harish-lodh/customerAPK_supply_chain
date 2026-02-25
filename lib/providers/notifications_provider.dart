@@ -32,14 +32,17 @@ class NotificationsProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await apiService.getNotifications();
       
-      // Mock data
-      final mockList = NotificationList.mock();
-      _notifications = mockList.notifications;
-      _unreadCount = mockList.unreadCount;
-      _state = NotificationsState.loaded;
+      if (response.statusCode == 200 && response.data != null) {
+        final List<dynamic> data = response.data['notifications'] ?? response.data;
+        _notifications = data.map((json) => AppNotification.fromJson(json)).toList();
+        _unreadCount = _notifications.where((n) => !n.isRead).length;
+        _state = NotificationsState.loaded;
+      } else {
+        _errorMessage = 'Failed to load notifications.';
+        _state = NotificationsState.error;
+      }
     } catch (e) {
       _errorMessage = 'Failed to load notifications.';
       _state = NotificationsState.error;
@@ -50,6 +53,8 @@ class NotificationsProvider extends ChangeNotifier {
   // Mark as Read
   Future<void> markAsRead(String notificationId) async {
     try {
+      await apiService.markNotificationRead(notificationId);
+      
       final index = _notifications.indexWhere((n) => n.id == notificationId);
       if (index != -1) {
         // Update local state
@@ -75,6 +80,8 @@ class NotificationsProvider extends ChangeNotifier {
   // Mark All as Read
   Future<void> markAllAsRead() async {
     try {
+      await apiService.markAllNotificationsRead();
+      
       _notifications = _notifications.map((n) => AppNotification(
         id: n.id,
         title: n.title,

@@ -11,16 +11,18 @@ class AppConstants {
   static const String refreshTokenEndpoint = '/auth/refresh';
   static const String logoutEndpoint = '/auth/logout';
   
-  static const String dashboardEndpoint = '/dashboard';
-  static const String drawdownEndpoint = '/drawdown';
-  static const String drawdownListEndpoint = '/drawdown/list';
-  static const String loansEndpoint = '/loans';
-  static const String loanDetailEndpoint = '/loans/detail';
-  static const String loanScheduleEndpoint = '/loans/schedule';
-  static const String transactionsEndpoint = '/transactions';
-  static const String notificationsEndpoint = '/notifications';
-  static const String profileEndpoint = '/customerDetails';
-  static const String bankDetailsEndpoint = '/profile/bank-details';
+  static const String dashboardEndpoint = '/customers/dashboard';
+  static const String drawdownEndpoint = '/customers/drawdown';
+  static const String drawdownListEndpoint = '/customers/drawdown/list';
+  static const String loansEndpoint = '/customers/loans';
+  static const String loanDetailEndpoint = '/customers/loans/detail';
+  static const String loanScheduleEndpoint = '/customers/loans/schedule';
+  static const String loanStatementEndpoint = '/customers/loans/statement';
+  static const String loanForeclosurePreviewEndpoint = '/customers/loans/foreclosure-preview';
+  static const String transactionsEndpoint = '/customers/transactions';
+  static const String notificationsEndpoint = '/customers/notifications';
+  static const String profileEndpoint = '/customers/profile';
+  static const String bankDetailsEndpoint = '/customers/profile/bank-details';
   
   // Storage Keys
   static const String accessTokenKey = 'access_token';

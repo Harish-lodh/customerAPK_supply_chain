@@ -40,21 +40,26 @@ class TransactionsProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await apiService.getTransactions(_currentPage, 20);
       
-      // Mock data
-      final mockList = TransactionList.mock(page: _currentPage);
-      
-      if (refresh) {
-        _transactions = mockList.transactions;
+      if (response.statusCode == 200 && response.data != null) {
+        final List<dynamic> data = response.data['transactions'] ?? response.data;
+        final newTransactions = data.map((json) => Transaction.fromJson(json)).toList();
+        
+        if (refresh) {
+          _transactions = newTransactions;
+        } else {
+          _transactions.addAll(newTransactions);
+        }
+        
+        // Check if there are more pages
+        _hasMore = newTransactions.length >= 20;
+        _currentPage++;
+        _state = TransactionsState.loaded;
       } else {
-        _transactions.addAll(mockList.transactions);
+        _errorMessage = 'Failed to load transactions. Please try again.';
+        _state = TransactionsState.error;
       }
-      
-      _hasMore = mockList.hasMore;
-      _currentPage++;
-      _state = TransactionsState.loaded;
     } catch (e) {
       _errorMessage = 'Failed to load transactions. Please try again.';
       _state = TransactionsState.error;
@@ -71,25 +76,11 @@ class TransactionsProvider extends ChangeNotifier {
   // Get Transaction Receipt
   Future<void> getTransactionReceipt(String transactionId) async {
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 500));
+      final response = await apiService.getTransactionReceipt(transactionId);
       
-      // Mock receipt
-      _receipt = TransactionReceipt(
-        transactionId: transactionId,
-        loanNumber: 'SCF/2024/001',
-        transactionType: 'REPAYMENT',
-        amount: 250000,
-        transactionDate: DateTime.now(),
-        status: 'SUCCESS',
-        utrNumber: 'UTR${DateTime.now().millisecondsSinceEpoch}',
-        paymentMode: 'NEFT',
-        bankName: 'HDFC Bank',
-        accountNumber: '50200012345678',
-        remarks: 'EMI Payment - January 2024',
-        companyName: 'ABC Traders Pvt Ltd',
-        companyGst: '29AABCU9600R1ZN',
-      );
+      if (response.statusCode == 200 && response.data != null) {
+        _receipt = TransactionReceipt.fromJson(response.data);
+      }
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to load receipt.';

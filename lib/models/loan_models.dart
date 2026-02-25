@@ -34,24 +34,28 @@ class Loan {
   factory Loan.fromJson(Map<String, dynamic> json) {
     return Loan(
       id: json['id'] ?? '',
-      loanNumber: json['loan_number'] ?? '',
-      productType: json['product_type'] ?? '',
-      sanctionedAmount: (json['sanctioned_amount'] ?? 0).toDouble(),
-      utilizedAmount: (json['utilized_amount'] ?? 0).toDouble(),
-      outstandingAmount: (json['outstanding_amount'] ?? 0).toDouble(),
-      status: json['status'] ?? '',
-      disbursementDate: DateTime.parse(json['disbursement_date'] ?? DateTime.now().toIso8601String()),
-      maturityDate: json['maturity_date'] != null 
-          ? DateTime.parse(json['maturity_date']) 
-          : null,
-      interestRate: (json['interest_rate'] ?? 0).toDouble(),
+      loanNumber: json['lan'] ?? '',
+      productType: json['product_type'] ?? 'Loan',
+      sanctionedAmount: _parseDouble(json['sanction_amount']),
+      utilizedAmount: _parseDouble(json['utilized_sanction_limit']),
+      outstandingAmount: _parseDouble(json['unutilization_sanction_limit']),
+      status: 'ACTIVE',
+      disbursementDate: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+      maturityDate: null,
+      interestRate: _parseDouble(json['interest_rate']),
       tenureMonths: json['tenure_months'] ?? 0,
-      emiAmount: (json['emi_amount'] ?? 0).toDouble(),
-      dealerName: json['dealer_name'],
-      emiSchedule: (json['emi_schedule'] as List<dynamic>?)
-          ?.map((e) => EmiSchedule.fromJson(e))
-          .toList() ?? [],
+      emiAmount: 0,
+      dealerName: null,
+      emiSchedule: const [],
     );
+  }
+
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
   }
   
   // Mock data for demo
