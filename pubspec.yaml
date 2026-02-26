@@ -20,7 +20,7 @@ dependencies:
   
   # Local Storage
   flutter_secure_storage: ^9.0.0
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.5.4
   
   # UI Components
   cupertino_icons: ^1.0.6
@@ -48,5 +48,3 @@ flutter:
   
   assets:
     - .env
-    - assets/images/
-    - assets/icons/
