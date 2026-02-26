@@ -207,6 +207,30 @@ class ApiService {
     return await get('${AppConstants.transactionsEndpoint}/$id/receipt');
   }
 
+  /// Get transactions by LAN
+  /// GET /customers/transactions?lan={lan}
+  Future<Response> getTransactionsByLan(String lan) async {
+    return await get(
+      AppConstants.transactionsEndpoint,
+      queryParameters: {'lan': lan},
+    );
+  }
+
+  /// Get transaction detail with allocation
+  /// GET /customers/transaction-detail?lan={lan}&utr={utr}
+  Future<Response> getTransactionDetail(String lan, String utr) async {
+    return await get(
+      AppConstants.transactionDetailEndpoint,
+      queryParameters: {'lan': lan, 'utr': utr},
+    );
+  }
+
+  /// Get lender types (LAN)
+  /// GET /customers/lan
+  Future<Response> getLenderTypes() async {
+    return await get(AppConstants.lenderTypesEndpoint);
+  }
+
   /// Get all notifications
   /// GET /notifications
   Future<Response> getNotifications() async {

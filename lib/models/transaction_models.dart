@@ -86,6 +86,37 @@ class Transaction {
   bool get isDebit => type == 'REPAYMENT' || type == 'INTEREST' || type == 'PROCESSING_FEE';
 }
 
+/// Collection Transaction model for /customers/transactions/by-lan API
+/// Response format: { "success": true, "data": [{ "collection_date": "...", "collection_amount": ..., "collection_utr": "..." }] }
+class CollectionTransaction {
+  final DateTime collectionDate;
+  final double collectionAmount;
+  final String? collectionUtr;
+  
+  CollectionTransaction({
+    required this.collectionDate,
+    required this.collectionAmount,
+    this.collectionUtr,
+  });
+  
+  factory CollectionTransaction.fromJson(Map<String, dynamic> json) {
+    return CollectionTransaction(
+      collectionDate: DateTime.parse(json['collection_date'] ?? DateTime.now().toIso8601String()),
+      collectionAmount: (json['collection_amount'] ?? 0).toDouble(),
+      collectionUtr: json['collection_utr'],
+    );
+  }
+  
+  // Mock data for demo
+  factory CollectionTransaction.mock(int index) {
+    return CollectionTransaction(
+      collectionDate: DateTime.now().subtract(Duration(days: index * 3)),
+      collectionAmount: [7000000.0, 5000000.0, 3000000.0, 2500000.0][index % 4],
+      collectionUtr: 'UTR${555550 + index}',
+    );
+  }
+}
+
 class TransactionList {
   final List<Transaction> transactions;
   final int totalCount;
@@ -176,6 +207,85 @@ class TransactionReceipt {
       remarks: json['remarks'],
       companyName: json['company_name'],
       companyGst: json['company_gst'],
+    );
+  }
+}
+
+/// Transaction Detail with Allocation data
+/// GET /customers/transaction-detail?lan={lan}&utr={utr}
+class TransactionDetail {
+  final String lan;
+  final String collectionUtr;
+  final double totalCollected;
+  final AllocationBreakup allocationBreakup;
+  final List<InvoiceAllocation> invoiceWiseAllocation;
+  
+  TransactionDetail({
+    required this.lan,
+    required this.collectionUtr,
+    required this.totalCollected,
+    required this.allocationBreakup,
+    required this.invoiceWiseAllocation,
+  });
+  
+  factory TransactionDetail.fromJson(Map<String, dynamic> json) {
+    final allocationBreakupJson = json['allocation_breakup'] ?? {};
+    final invoiceList = json['invoice_wise_allocation'] as List<dynamic>? ?? [];
+    
+    return TransactionDetail(
+      lan: json['lan'] ?? '',
+      collectionUtr: json['collection_utr'] ?? '',
+      totalCollected: (json['total_collected'] ?? 0).toDouble(),
+      allocationBreakup: AllocationBreakup.fromJson(allocationBreakupJson),
+      invoiceWiseAllocation: invoiceList
+          .map((e) => InvoiceAllocation.fromJson(e))
+          .toList(),
+    );
+  }
+}
+
+class AllocationBreakup {
+  final double allocatedPrincipal;
+  final double allocatedInterest;
+  final double allocatedPenalInterest;
+  final double excessPayment;
+  
+  AllocationBreakup({
+    required this.allocatedPrincipal,
+    required this.allocatedInterest,
+    required this.allocatedPenalInterest,
+    required this.excessPayment,
+  });
+  
+  factory AllocationBreakup.fromJson(Map<String, dynamic> json) {
+    return AllocationBreakup(
+      allocatedPrincipal: (json['allocated_principal'] ?? 0).toDouble(),
+      allocatedInterest: (json['allocated_interest'] ?? 0).toDouble(),
+      allocatedPenalInterest: (json['allocated_penal_interest'] ?? 0).toDouble(),
+      excessPayment: (json['excess_payment'] ?? 0).toDouble(),
+    );
+  }
+}
+
+class InvoiceAllocation {
+  final String invoiceNumber;
+  final double allocatedPrincipal;
+  final double allocatedInterest;
+  final double allocatedPenalInterest;
+  
+  InvoiceAllocation({
+    required this.invoiceNumber,
+    required this.allocatedPrincipal,
+    required this.allocatedInterest,
+    required this.allocatedPenalInterest,
+  });
+  
+  factory InvoiceAllocation.fromJson(Map<String, dynamic> json) {
+    return InvoiceAllocation(
+      invoiceNumber: json['invoice_number'] ?? '',
+      allocatedPrincipal: (json['allocated_principal'] ?? 0).toDouble(),
+      allocatedInterest: (json['allocated_interest'] ?? 0).toDouble(),
+      allocatedPenalInterest: (json['allocated_penal_interest'] ?? 0).toDouble(),
     );
   }
 }

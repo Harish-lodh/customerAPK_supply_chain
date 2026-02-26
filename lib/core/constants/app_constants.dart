@@ -19,7 +19,9 @@ class AppConstants {
   static const String loanScheduleEndpoint = '/customers/loans/schedule';
   static const String loanStatementEndpoint = '/customers/loans/statement';
   static const String loanForeclosurePreviewEndpoint = '/customers/loans/foreclosure-preview';
-  static const String transactionsEndpoint = '/customers/transactions';
+  static const String transactionsEndpoint = '/customers/transactions/getRepayments';
+  static const String transactionDetailEndpoint = '/customers/transaction-detail';
+  static const String lenderTypesEndpoint = '/customers/lan';
   static const String notificationsEndpoint = '/customers/notifications';
   static const String profileEndpoint = '/customers/profile';
   static const String bankDetailsEndpoint = '/customers/profile/bank-details';

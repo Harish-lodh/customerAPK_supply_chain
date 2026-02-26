@@ -18,6 +18,20 @@ class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
   String? _selectedDealerId;
   String? _selectedInvoiceId;
 
+  // Helper method to get safe dealer value
+  String? _getSafeDealerValue(DrawdownProvider provider) {
+    if (provider.dealers.isEmpty) return null;
+    final dealerIds = provider.dealers.map((d) => d.id).toList();
+    return dealerIds.contains(_selectedDealerId) ? _selectedDealerId : null;
+  }
+
+  // Helper method to get safe invoice value
+  String? _getSafeInvoiceValue(DrawdownProvider provider) {
+    if (provider.invoices.isEmpty) return null;
+    final invoiceIds = provider.invoices.map((i) => i.id).toList();
+    return invoiceIds.contains(_selectedInvoiceId) ? _selectedInvoiceId : null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -81,7 +95,7 @@ class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
                   // Dealer Dropdown
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(labelText: 'Select Dealer'),
-                    value: _selectedDealerId,
+                    value: _getSafeDealerValue(provider),
                     items: provider.dealers.map((dealer) {
                       return DropdownMenuItem(
                         value: dealer.id,
@@ -96,7 +110,7 @@ class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
                   // Invoice Dropdown
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(labelText: 'Select Invoice'),
-                    value: _selectedInvoiceId,
+                    value: _getSafeInvoiceValue(provider),
                     items: provider.invoices.map((invoice) {
                       return DropdownMenuItem(
                         value: invoice.id,
