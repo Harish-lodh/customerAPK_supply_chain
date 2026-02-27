@@ -23,14 +23,22 @@ class _MainScaffoldState extends State<MainScaffold> {
     '/profile',
   ];
   
-  void _onTabTapped(int index) {
-    if (_currentIndex != index) {
-      setState(() {
-        _currentIndex = index;
-      });
-      context.go(_routes[index]);
-    }
+void _onTabTapped(int index) {
+  if (_currentIndex == index) return;
+
+  final navigator = Navigator.of(context, rootNavigator: true);
+
+  // Close ONLY modal / dialog / bottom sheet
+  if (navigator.canPop()) {
+    navigator.pop();
   }
+
+  setState(() {
+    _currentIndex = index;
+  });
+
+  context.go(_routes[index]);
+}
   
   @override
   void didChangeDependencies() {

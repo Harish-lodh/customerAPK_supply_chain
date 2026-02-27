@@ -87,9 +87,9 @@ class TransactionsProvider extends ChangeNotifier {
     
     notifyListeners();
     
-    // Load transactions for selected LAN
+    // Load transactions for selected LAN (refresh to clear any existing data)
     if (_selectedLan != null) {
-      await loadTransactionsByLan();
+      await loadTransactionsByLan(refresh: true);
     }
   }
   
