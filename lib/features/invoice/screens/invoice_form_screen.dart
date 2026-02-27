@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../providers/drawdown_provider.dart';
+import '../../../providers/invoice_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 
-class DrawdownFormScreen extends StatefulWidget {
-  const DrawdownFormScreen({super.key});
+class InvoiceFormScreen extends StatefulWidget {
+  const InvoiceFormScreen({super.key});
 
   @override
-  State<DrawdownFormScreen> createState() => _DrawdownFormScreenState();
+  State<InvoiceFormScreen> createState() => _InvoiceFormScreenState();
 }
 
-class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
+class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   String? _selectedDealerId;
   String? _selectedInvoiceId;
 
   // Helper method to get safe dealer value
-  String? _getSafeDealerValue(DrawdownProvider provider) {
+  String? _getSafeDealerValue(InvoiceProvider provider) {
     if (provider.dealers.isEmpty) return null;
     final dealerIds = provider.dealers.map((d) => d.id).toList();
     return dealerIds.contains(_selectedDealerId) ? _selectedDealerId : null;
   }
 
   // Helper method to get safe invoice value
-  String? _getSafeInvoiceValue(DrawdownProvider provider) {
+  String? _getSafeInvoiceValue(InvoiceProvider provider) {
     if (provider.invoices.isEmpty) return null;
     final invoiceIds = provider.invoices.map((i) => i.id).toList();
     return invoiceIds.contains(_selectedInvoiceId) ? _selectedInvoiceId : null;
@@ -36,7 +36,7 @@ class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<DrawdownProvider>(context, listen: false);
+      final provider = Provider.of<InvoiceProvider>(context, listen: false);
       provider.loadDealers();
       provider.loadInvoices();
     });
@@ -50,7 +50,7 @@ class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
 
   void _calculateFee() {
     final amount = double.tryParse(_amountController.text) ?? 0;
-    Provider.of<DrawdownProvider>(context, listen: false).calculateProcessingFee(amount);
+    Provider.of<InvoiceProvider>(context, listen: false).calculateProcessingFee(amount);
   }
 
   Future<void> _submit() async {
@@ -62,8 +62,8 @@ class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
       return;
     }
 
-    final provider = Provider.of<DrawdownProvider>(context, listen: false);
-    final success = await provider.submitDrawdownRequest(
+    final provider = Provider.of<InvoiceProvider>(context, listen: false);
+    final success = await provider.submitInvoiceRequest(
       invoiceId: _selectedInvoiceId!,
       dealerId: _selectedDealerId!,
       amount: double.parse(_amountController.text),
@@ -82,8 +82,8 @@ class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
     final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Apply Drawdown')),
-      body: Consumer<DrawdownProvider>(
+      appBar: AppBar(title: const Text('Apply for Invoice')),
+      body: Consumer<InvoiceProvider>(
         builder: (context, provider, child) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -127,7 +127,7 @@ class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
                     controller: _amountController,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: 'Drawdown Amount',
+                      labelText: 'Invoice Amount',
                       prefixText: '₹ ',
                     ),
                     onChanged: (_) => _calculateFee(),
@@ -164,8 +164,8 @@ class _DrawdownFormScreenState extends State<DrawdownFormScreen> {
 
                   // Submit Button
                   ElevatedButton(
-                    onPressed: provider.state == DrawdownState.submitting ? null : _submit,
-                    child: provider.state == DrawdownState.submitting
+                    onPressed: provider.state == InvoiceState.submitting ? null : _submit,
+                    child: provider.state == InvoiceState.submitting
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text('Submit Request'),
                   ),

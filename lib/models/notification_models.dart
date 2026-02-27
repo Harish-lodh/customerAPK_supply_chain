@@ -34,19 +34,19 @@ class AppNotification {
   
   // Mock data for demo
   factory AppNotification.mock(int index) {
-    final types = ['LOAN_APPROVED', 'EMI_DUE', 'OVERDUE', 'DRAWDOWN_STATUS', 'GENERAL'];
+    final types = ['LOAN_APPROVED', 'EMI_DUE', 'OVERDUE', 'INVOICE_STATUS', 'GENERAL'];
     final titles = [
       'Loan Approved',
       'EMI Due Reminder',
       'Overdue Alert',
-      'Drawdown Status Update',
+      'Invoice Status Update',
       'Important Update',
     ];
     final messages = [
       'Your loan application SCF/2024/001 has been approved.',
       'Your EMI of ₹2,50,000 is due on 25th February 2024.',
       'Your loan SCF/2024/001 has an overdue amount of ₹50,000.',
-      'Your drawdown request DD/2024/001 has been processed.',
+      'Your invoice request INV/2024/001 has been processed.',
       'Please update your contact details for better service.',
     ];
     
@@ -70,8 +70,8 @@ class AppNotification {
         return 'EMI Due';
       case 'OVERDUE':
         return 'Overdue';
-      case 'DRAWDOWN_STATUS':
-        return 'Drawdown';
+      case 'INVOICE_STATUS':
+        return 'Invoice';
       case 'GENERAL':
         return 'General';
       default:

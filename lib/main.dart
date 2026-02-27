@@ -7,7 +7,7 @@ import 'core/services/secure_storage_service.dart';
 import 'core/services/api_service.dart';
 import 'providers/auth_provider.dart';
 import 'providers/dashboard_provider.dart';
-import 'providers/drawdown_provider.dart';
+import 'providers/invoice_provider.dart';
 import 'providers/loans_provider.dart';
 import 'providers/transactions_provider.dart';
 import 'providers/notifications_provider.dart';
@@ -49,9 +49,9 @@ void main() async {
           create: (_) => DashboardProvider(apiService: apiService),
           update: (_, auth, dashboard) => dashboard ?? DashboardProvider(apiService: apiService),
         ),
-        ChangeNotifierProxyProvider<AuthProvider, DrawdownProvider>(
-          create: (_) => DrawdownProvider(apiService: apiService),
-          update: (_, auth, drawdown) => drawdown ?? DrawdownProvider(apiService: apiService),
+        ChangeNotifierProxyProvider<AuthProvider, InvoiceProvider>(
+          create: (_) => InvoiceProvider(apiService: apiService),
+          update: (_, auth, invoice) => invoice ?? InvoiceProvider(apiService: apiService),
         ),
         ChangeNotifierProxyProvider<AuthProvider, LoansProvider>(
           create: (_) => LoansProvider(apiService: apiService),

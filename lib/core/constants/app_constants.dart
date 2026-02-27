@@ -12,8 +12,8 @@ class AppConstants {
   static const String logoutEndpoint = '/auth/logout';
   
   static const String dashboardEndpoint = '/customers/dashboard';
-  static const String drawdownEndpoint = '/customers/drawdown';
-  static const String drawdownListEndpoint = '/customers/drawdown/list';
+  static const String invoiceEndpoint = '/customers/invoice';
+  static const String invoiceListEndpoint = '/customers/invoice/list';
   static const String loansEndpoint = '/customers/loans';
   static const String loanDetailEndpoint = '/customers/loans/detail';
   static const String loanScheduleEndpoint = '/customers/loans/schedule';
@@ -25,6 +25,9 @@ class AppConstants {
   static const String notificationsEndpoint = '/customers/notifications';
   static const String profileEndpoint = '/customers/profile';
   static const String bankDetailsEndpoint = '/customers/profile/bank-details';
+  
+  // Invoice Details Endpoint
+  static const String invoiceDetailsEndpoint = '/customers/invoice-details';
   
   // Storage Keys
   static const String accessTokenKey = 'access_token';

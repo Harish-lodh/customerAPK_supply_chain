@@ -17,7 +17,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   
   final List<String> _routes = [
     '/dashboard',
-    '/drawdown',
+    '/invoices',
     '/loans',
     '/transactions',
     '/profile',
@@ -71,9 +71,9 @@ void _onTabTapped(int index) {
             label: 'Dashboard',
           ),
           const BottomNavigationBarItem(
-            icon: Icon(Icons.request_quote_outlined),
-            activeIcon: Icon(Icons.request_quote),
-            label: 'Drawdown',
+            icon: Icon(Icons.receipt_long_outlined),
+            activeIcon: Icon(Icons.receipt_long),
+            label: 'Invoices',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_outlined),

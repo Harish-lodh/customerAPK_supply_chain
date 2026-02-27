@@ -71,7 +71,7 @@ class Dashboard {
       overdueAmount: 0,
       nextEmiDate: DateTime.now().add(const Duration(days: 15)),
       quickActions: [
-        QuickAction(id: '1', title: 'Apply Drawdown', icon: 'drawdown'),
+        QuickAction(id: '1', title: 'Apply Invoice', icon: 'invoice'),
         QuickAction(id: '2', title: 'View Statement', icon: 'statement'),
         QuickAction(id: '3', title: 'Repay Now', icon: 'repayment'),
         QuickAction(id: '4', title: 'Foreclosure', icon: 'foreclosure'),

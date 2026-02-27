@@ -410,9 +410,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       childAspectRatio: 1.5,
       children: [
         _buildActionCard(
-          'Apply Drawdown',
-          Icons.request_quote,
-          () => context.push('/drawdown/apply'),
+          'View Invoices',
+          Icons.receipt_long,
+          () => context.go('/invoices'),
         ),
         _buildActionCard(
           'View Statement',

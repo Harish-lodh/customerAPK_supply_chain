@@ -6,8 +6,8 @@ import '../providers/auth_provider.dart';
 import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/otp_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
-import '../features/drawdown/screens/drawdown_list_screen.dart';
-import '../features/drawdown/screens/drawdown_form_screen.dart';
+import '../features/invoice/screens/invoice_list_screen.dart';
+import '../features/invoice/screens/invoice_detail_screen.dart';
 import '../features/loans/screens/loans_screen.dart';
 import '../features/loans/screens/loan_detail_screen.dart';
 import '../features/transactions/screens/transactions_screen.dart';
@@ -74,11 +74,11 @@ class AppRouter {
             ),
           ),
           
-          // Drawdown
+          // Invoices
           GoRoute(
-            path: '/drawdown',
+            path: '/invoices',
             pageBuilder: (context, state) => const NoTransitionPage(
-              child: DrawdownListScreen(),
+              child: InvoiceListScreen(),
             ),
           ),
           
@@ -108,10 +108,13 @@ class AppRouter {
         ],
       ),
       
-      // Drawdown Form (outside shell)
+      // Invoice Detail
       GoRoute(
-        path: '/drawdown/apply',
-        builder: (context, state) => const DrawdownFormScreen(),
+        path: '/invoices/:invoiceId',
+        builder: (context, state) {
+          final invoiceId = state.pathParameters['invoiceId']!;
+          return InvoiceDetailScreen(invoiceId: invoiceId);
+        },
       ),
       
       // Loan Detail

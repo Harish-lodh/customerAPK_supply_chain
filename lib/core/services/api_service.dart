@@ -127,16 +127,16 @@ class ApiService {
     return await get(AppConstants.dashboardEndpoint);
   }
 
-  /// Get drawdown list
-  /// GET /drawdown/list
-  Future<Response> getDrawdownList() async {
-    return await get(AppConstants.drawdownListEndpoint);
+  /// Get invoice list
+  /// GET /invoice/list
+  Future<Response> getInvoiceList() async {
+    return await get(AppConstants.invoiceListEndpoint);
   }
 
-  /// Submit a new drawdown request
-  /// POST /drawdown
-  Future<Response> submitDrawdown(Map<String, dynamic> body) async {
-    return await post(AppConstants.drawdownEndpoint, data: body);
+  /// Submit a new invoice request
+  /// POST /invoice
+  Future<Response> submitInvoice(Map<String, dynamic> body) async {
+    return await post(AppConstants.invoiceEndpoint, data: body);
   }
 
   /// Get all loans
@@ -247,6 +247,15 @@ class ApiService {
   /// PUT /notifications/read-all
   Future<Response> markAllNotificationsRead() async {
     return await put('${AppConstants.notificationsEndpoint}/read-all');
+  }
+
+  /// Get invoice details by lender
+  /// GET /customers/invoice-details?lender={lender}
+  Future<Response> getInvoiceDetails(String lender) async {
+    return await get(
+      AppConstants.invoiceDetailsEndpoint,
+      queryParameters: {'lender': lender},
+    );
   }
 
   /// Get bank details for profile
