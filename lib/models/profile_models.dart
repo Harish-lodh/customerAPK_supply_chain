@@ -148,9 +148,9 @@ class SupportContact {
   // Mock data for demo
   factory SupportContact.mock() {
     return SupportContact(
-      email: 'support@fintree-scf.com',
+      email: 'wecarefintree@gmail.com',
       phone: '+91 1800 123 4567',
-      whatsapp: '+91 9876543210',
+      whatsapp: '',
       workingHours: 'Mon - Sat, 9:00 AM - 6:00 PM',
     );
   }

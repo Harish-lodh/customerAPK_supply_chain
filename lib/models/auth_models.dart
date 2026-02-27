@@ -44,7 +44,7 @@ class User {
 
 /// Customer model for backend login response
 class Customer {
-  final int id;
+  final String id;
   final String name;
   final String companyName;
   final String mobile;
@@ -57,8 +57,19 @@ class Customer {
   });
   
   factory Customer.fromJson(Map<String, dynamic> json) {
+    // Handle id as either string or int from backend
+    final idValue = json['id'];
+    String id;
+    if (idValue is String) {
+      id = idValue;
+    } else if (idValue is int) {
+      id = idValue.toString();
+    } else {
+      id = '0';
+    }
+    
     return Customer(
-      id: json['id'] ?? 0,
+      id: id,
       name: json['name'] ?? '',
       companyName: json['companyName'] ?? json['company_name'] ?? '',
       mobile: json['mobile'] ?? '',

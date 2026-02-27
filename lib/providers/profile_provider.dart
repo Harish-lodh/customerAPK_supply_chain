@@ -94,9 +94,9 @@ class ProfileProvider extends ChangeNotifier {
           
           // Support contact - can be fetched from separate endpoint or use defaults
           _supportContact = SupportContact(
-            email: 'support@fintree-scf.com',
-            phone: '+91 1800 123 4567',
-            whatsapp: '+91 9876543210',
+            email: 'wecarefintree@gmail.com',
+            phone: '+18002678111',
+            whatsapp: '',
             workingHours: 'Mon - Sat, 9:00 AM - 6:00 PM',
           );
           

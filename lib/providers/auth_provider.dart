@@ -128,14 +128,14 @@ class AuthProvider extends ChangeNotifier {
           // Save session using SessionService
           await SessionService.saveSession(
             token: loginResponse.token,
-            customerId: loginResponse.customer?.id ?? 0,
+            customerId: int.tryParse(loginResponse.customer?.id ?? '0') ?? 0,
             name: loginResponse.customer?.name ?? '',
             companyName: loginResponse.customer?.companyName ?? '',
             partnerLanId: loginResponse.partnerLanId,
           );
           
           _user = User(
-            id: loginResponse.customer?.id.toString() ?? '',
+            id: loginResponse.customer?.id ?? '',
             mobileNumber: loginResponse.customer?.mobile ?? '',
             companyName: loginResponse.customer?.companyName ?? '',
             email: '',
@@ -201,14 +201,14 @@ class AuthProvider extends ChangeNotifier {
           // Save session using SessionService
           await SessionService.saveSession(
             token: loginResponse.token,
-            customerId: loginResponse.customer?.id ?? 0,
+            customerId: int.tryParse(loginResponse.customer?.id ?? '0') ?? 0,
             name: loginResponse.customer?.name ?? '',
             companyName: loginResponse.customer?.companyName ?? '',
             partnerLanId: loginResponse.partnerLanId,
           );
           
           _user = User(
-            id: loginResponse.customer?.id.toString() ?? '',
+            id: loginResponse.customer?.id ?? '',
             mobileNumber: loginResponse.customer?.mobile ?? '',
             companyName: loginResponse.customer?.companyName ?? '',
             email: '',
