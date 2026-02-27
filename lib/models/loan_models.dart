@@ -124,6 +124,53 @@ class EmiSchedule {
   }
 }
 
+// New EMI Schedule Response model for the new API format
+class EmiScheduleResponse {
+  final String invoiceNumber;
+  final DateTime invoiceDueDate;
+  final DateTime disbursementDate;
+  final double totalAmountDemand;
+  final double remainingPrincipal;
+  final double remainingInterest;
+  final double remainingPenalInterest;
+  final double overdueAmountDemand;
+  final String status;
+  
+  EmiScheduleResponse({
+    required this.invoiceNumber,
+    required this.invoiceDueDate,
+    required this.disbursementDate,
+    required this.totalAmountDemand,
+    required this.remainingPrincipal,
+    required this.remainingInterest,
+    required this.remainingPenalInterest,
+    required this.overdueAmountDemand,
+    required this.status,
+  });
+  
+  factory EmiScheduleResponse.fromJson(Map<String, dynamic> json) {
+    return EmiScheduleResponse(
+      invoiceNumber: json['invoice_number'] ?? '',
+      invoiceDueDate: DateTime.parse(json['invoice_due_date'] ?? DateTime.now().toIso8601String()),
+      disbursementDate: DateTime.parse(json['disbursement_date'] ?? DateTime.now().toIso8601String()),
+      totalAmountDemand: _parseDouble(json['total_amount_demand']),
+      remainingPrincipal: _parseDouble(json['remaining_principal']),
+      remainingInterest: _parseDouble(json['remaining_interest']),
+      remainingPenalInterest: _parseDouble(json['remaining_penal_interest']),
+      overdueAmountDemand: _parseDouble(json['overdue_amount_demand']),
+      status: json['status'] ?? 'Due',
+    );
+  }
+  
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+}
+
 class LoanStatement {
   final String loanId;
   final String loanNumber;

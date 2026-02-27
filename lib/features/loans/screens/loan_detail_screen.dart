@@ -35,7 +35,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
+    final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 2);
     final dateFormat = DateFormat('dd MMM yyyy');
 
     return Scaffold(
@@ -71,20 +71,42 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text('EMI Schedule', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text('EMI Schedule (Till Today)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 12),
-                ...loan.emiSchedule.map((emi) => Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: emi.status == 'PAID' ? AppColors.success.withOpacity(0.1) : AppColors.warning.withOpacity(0.1),
-                      child: Icon(emi.status == 'PAID' ? Icons.check : Icons.schedule, color: emi.status == 'PAID' ? AppColors.success : AppColors.warning),
+                if (provider.emiScheduleResponse.isEmpty)
+                  const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: Text('No EMI schedule data available')),
                     ),
-                    title: Text('EMI ${emi.emiNumber}'),
-                    subtitle: Text(dateFormat.format(emi.dueDate)),
-                    trailing: Text(currencyFormat.format(emi.amount), style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                )),
+                  )
+                else
+                  ...provider.emiScheduleResponse.map((emi) => Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(emi.invoiceNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              _buildStatusChip(emi.status),
+                            ],
+                          ),
+                          const Divider(height: 16),
+                          _buildDetailRow('Invoice Due Date', dateFormat.format(emi.invoiceDueDate)),
+                          _buildDetailRow('Disbursement Date', dateFormat.format(emi.disbursementDate)),
+                          _buildDetailRow('Total Amount Demand', currencyFormat.format(emi.totalAmountDemand)),
+                          _buildDetailRow('Total Principal demand', currencyFormat.format(emi.remainingPrincipal)),
+                          _buildDetailRow('Total Interest demand', currencyFormat.format(emi.remainingInterest)),
+                          _buildDetailRow('Total Penal Interest', currencyFormat.format(emi.remainingPenalInterest)),
+                          _buildDetailRow('Overdue Amount Demand', currencyFormat.format(emi.overdueAmountDemand)),
+                        ],
+                      ),
+                    ),
+                  )),
               ],
             ),
           );
@@ -93,9 +115,46 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
     );
   }
 
+  Widget _buildStatusChip(String status) {
+    Color backgroundColor;
+    Color textColor;
+    
+    switch (status.toUpperCase()) {
+      case 'PAID':
+      case 'PAID-ONETIME':
+        backgroundColor = AppColors.success.withOpacity(0.1);
+        textColor = AppColors.success;
+        break;
+      case 'OVERDUE':
+      case 'DUE':
+        backgroundColor = AppColors.error.withOpacity(0.1);
+        textColor = AppColors.error;
+        break;
+      case 'PENDING':
+        backgroundColor = AppColors.warning.withOpacity(0.1);
+        textColor = AppColors.warning;
+        break;
+      default:
+        backgroundColor = AppColors.info.withOpacity(0.1);
+        textColor = AppColors.info;
+    }
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(color: textColor, fontWeight: FontWeight.w600, fontSize: 12),
+      ),
+    );
+  }
+
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

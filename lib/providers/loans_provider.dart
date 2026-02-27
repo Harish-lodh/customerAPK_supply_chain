@@ -17,6 +17,7 @@ class LoansProvider extends ChangeNotifier {
   Loan? _selectedLoan;
   LoanStatement? _loanStatement;
   ForeclosurePreview? _foreclosurePreview;
+  List<EmiScheduleResponse> _emiScheduleResponse = [];
   String? _errorMessage;
   
   LoansProvider({required this.apiService});
@@ -27,6 +28,7 @@ class LoansProvider extends ChangeNotifier {
   Loan? get selectedLoan => _selectedLoan;
   LoanStatement? get loanStatement => _loanStatement;
   ForeclosurePreview? get foreclosurePreview => _foreclosurePreview;
+  List<EmiScheduleResponse> get emiScheduleResponse => _emiScheduleResponse;
   String? get errorMessage => _errorMessage;
   
   // Load Loans
@@ -79,6 +81,31 @@ class LoansProvider extends ChangeNotifier {
       
       if (response.statusCode == 200 && response.data != null) {
         _selectedLoan = loan;
+        
+        // Parse the new EMI schedule response format
+        final Map<String, dynamic> responseData = response.data;
+        final List<dynamic> data = responseData['data'] ?? [];
+        
+        // Convert to EmiScheduleResponse objects
+        List<EmiScheduleResponse> schedules = data
+            .map((json) => EmiScheduleResponse.fromJson(json))
+            .toList();
+        
+        // Filter to show only EMI schedule till today (2026-02-27)
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        
+        _emiScheduleResponse = schedules.where((schedule) {
+          final dueDate = DateTime(
+            schedule.invoiceDueDate.year,
+            schedule.invoiceDueDate.month,
+            schedule.invoiceDueDate.day,
+          );
+          return dueDate.isBefore(today) || dueDate.isAtSameMomentAs(today);
+        }).toList();
+        
+        // Sort by due date (most recent first)
+        _emiScheduleResponse.sort((a, b) => b.invoiceDueDate.compareTo(a.invoiceDueDate));
       }
       notifyListeners();
     } catch (e) {
