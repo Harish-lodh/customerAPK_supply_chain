@@ -141,8 +141,7 @@ class InvoiceDetailScreen extends StatelessWidget {
           _buildSectionTitle('Loan Information'),
           const SizedBox(height: 12),
           _buildDetailCard([
-            _buildDetailRow('LAN', invoice.lan),
-            _buildDetailRow('Lender', invoice.lender),
+            _buildDetailRow('Lender', invoice.lan),
             _buildDetailRow('Partner Loan ID', invoice.partnerLoanId),
             _buildDetailRow('Disbursement Date', dateFormat.format(invoice.disbursementDate)),
             if (invoice.disbursementUtr != null)
@@ -156,19 +155,12 @@ class InvoiceDetailScreen extends StatelessWidget {
           _buildDetailCard([
             _buildDetailRow('ROI Percentage', '${invoice.roiPercentage}%'),
             _buildDetailRow('Penal Rate', '${invoice.penalRate}%'),
-            _buildDetailRow('Total ROI Amount', currencyFormat.format(invoice.totalRoiAmount)),
-            _buildDetailRow('EMI Amount', currencyFormat.format(invoice.emiAmount)),
+            // _buildDetailRow('Total ROI Amount', currencyFormat.format(invoice.totalRoiAmount)),
+            // _buildDetailRow('EMI Amount', currencyFormat.format(invoice.emiAmount)),
           ]),
           const SizedBox(height: 24),
 
-          // Metadata
-          _buildSectionTitle('Additional Information'),
-          const SizedBox(height: 12),
-          _buildDetailCard([
-            _buildDetailRow('Created At', dateFormat.format(invoice.createdAt)),
-            _buildDetailRow('Updated At', dateFormat.format(invoice.updatedAt)),
-          ]),
-          const SizedBox(height: 32),
+        
         ],
       ),
     );

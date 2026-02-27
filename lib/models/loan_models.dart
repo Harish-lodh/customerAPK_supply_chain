@@ -154,9 +154,9 @@ class EmiScheduleResponse {
       invoiceDueDate: DateTime.parse(json['invoice_due_date'] ?? DateTime.now().toIso8601String()),
       disbursementDate: DateTime.parse(json['disbursement_date'] ?? DateTime.now().toIso8601String()),
       totalAmountDemand: _parseDouble(json['total_amount_demand']),
-      remainingPrincipal: _parseDouble(json['remaining_principal']),
-      remainingInterest: _parseDouble(json['remaining_interest']),
-      remainingPenalInterest: _parseDouble(json['remaining_penal_interest']),
+      remainingPrincipal: _parseDouble(json['remaining_disbursement_amount']),
+      remainingInterest: _parseDouble(json['cumulate_interest_demand']),
+      remainingPenalInterest: _parseDouble(json['cumelate_penal_interest_demand']),
       overdueAmountDemand: _parseDouble(json['overdue_amount_demand']),
       status: json['status'] ?? 'Due',
     );
