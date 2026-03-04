@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/otp_screen.dart';
+import '../features/auth/screens/register_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
 import '../features/invoice/screens/invoice_list_screen.dart';
 import '../features/invoice/screens/invoice_detail_screen.dart';
@@ -28,9 +29,10 @@ class AppRouter {
       final isLoggedIn = authProvider.isAuthenticated;
       final isLoggingIn = state.uri.path == '/login';
       final isOtpRoute = state.uri.path == '/otp';
+      final isRegisterRoute = state.uri.path == '/register';
       
-      // Allow OTP route only when coming from login
-      if (isOtpRoute) {
+      // Allow OTP and Register routes only when coming from login
+      if (isOtpRoute || isRegisterRoute) {
         return null;
       }
       
@@ -49,6 +51,12 @@ class AppRouter {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      
+      // Registration Route
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
       ),
       
       // OTP Verification Route

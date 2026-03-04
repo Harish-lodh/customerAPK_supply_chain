@@ -275,6 +275,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 
+                const SizedBox(height: 16),
+                
+                // Register Link
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account? ",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    TextButton(
+                      onPressed: _isLoading 
+                          ? null 
+                          : () {
+                              context.push('/register');
+                            },
+                      child: const Text('Register'),
+                    ),
+                  ],
+                ),
+                
                 // Error Message
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
