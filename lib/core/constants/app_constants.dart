@@ -6,28 +6,27 @@ class AppConstants {
   static const String stagingUrl = 'https://staging-api.fintree-scf.com/v1';
   
   // API Endpoints
-  static const String loginEndpoint = '/auth/login';
-  static const String otpEndpoint = '/auth/otp';
+
   static const String refreshTokenEndpoint = '/auth/refresh';
   static const String logoutEndpoint = '/auth/logout';
   
-  static const String dashboardEndpoint = '/customers/dashboard';
-  static const String invoiceEndpoint = '/customers/invoice';
-  static const String invoiceListEndpoint = '/customers/invoice/list';
-  static const String loansEndpoint = '/customers/loans';
-  static const String loanDetailEndpoint = '/customers/loans/detail';
-  static const String loanScheduleEndpoint = '/customers/loans/schedule';
-  static const String loanStatementEndpoint = '/customers/loans/statement';
-  static const String loanForeclosurePreviewEndpoint = '/customers/loans/foreclosure-preview';
-  static const String transactionsEndpoint = '/customers/transactions/getRepayments';
-  static const String transactionDetailEndpoint = '/customers/transaction-detail';
-  static const String lenderTypesEndpoint = '/customers/lan';
-  static const String notificationsEndpoint = '/customers/notifications';
-  static const String profileEndpoint = '/customers/profile';
-  static const String bankDetailsEndpoint = '/customers/profile/bank-details';
+  static const String dashboardEndpoint = '/lms-customers/dashboard';
+  static const String invoiceEndpoint = '/lms-customers/invoice';
+  static const String invoiceListEndpoint = '/lms-customers/invoice/list';
+  static const String loansEndpoint = '/lms-customers/loans';
+  static const String loanDetailEndpoint = '/lms-customers/loans/detail';
+  static const String loanScheduleEndpoint = '/lms-customers/loans/schedule';
+  static const String loanStatementEndpoint = '/lms-customers/loans/statement';
+  static const String loanForeclosurePreviewEndpoint = '/lms-customers/loans/foreclosure-preview';
+  static const String transactionsEndpoint = '/lms-customers/transactions/getRepayments';
+  static const String transactionDetailEndpoint = '/lms-customers/transaction-detail';
+  static const String lenderTypesEndpoint = '/lms-customers/lan';
+  static const String notificationsEndpoint = '/lms-customers/notifications';
+  static const String profileEndpoint = '/lms-customers/profile';
+  static const String bankDetailsEndpoint = '/lms-customers/profile/bank-details';
   
   // Invoice Details Endpoint
-  static const String invoiceDetailsEndpoint = '/customers/invoice-details';
+  static const String invoiceDetailsEndpoint = '/lms-customers/invoice-details';
   
   // Storage Keys
   static const String accessTokenKey = 'access_token';

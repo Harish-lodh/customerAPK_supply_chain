@@ -44,7 +44,7 @@ class ProfileProvider extends ChangeNotifier {
       }
       
       // Build dynamic endpoint
-      final endpoint = '/customers/$userId/customerDetails';
+      final endpoint = '/lms-customers/$userId/customerDetails';
       
       // Make API call to fetch profile data
       final response = await apiService.get(endpoint);

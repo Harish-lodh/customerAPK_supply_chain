@@ -77,7 +77,7 @@ class AuthProvider extends ChangeNotifier {
     
     try {
       final response = await apiService.post(
-        '/customers/login/otp',
+        '/lms-customers/login/otp',
         data: {'mobile': mobileNumber},
       );
       
@@ -112,7 +112,7 @@ class AuthProvider extends ChangeNotifier {
     
     try {
       final response = await apiService.post(
-        '/customers/login/otp/verify',
+        '/lms-customers/login/otp/verify',
         data: {
           'mobile': mobileNumber,
           'otp': otp,
@@ -185,7 +185,7 @@ class AuthProvider extends ChangeNotifier {
     
     try {
       final response = await apiService.post(
-        '/customers/login',
+        '/lms-customers/login',
         data: {
           'mobile': mobileNumber,
           'password': password,
@@ -256,7 +256,7 @@ class AuthProvider extends ChangeNotifier {
     
     try {
       final response = await apiService.post(
-        '/customers/password',
+        '/lms-customers/password',
         data: {
           'mobile': mobileNumber,
           'password': password,

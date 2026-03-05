@@ -208,7 +208,7 @@ class ApiService {
   }
 
   /// Get transactions by LAN
-  /// GET /customers/transactions?lan={lan}
+  /// GET /lms-customers/transactions?lan={lan}
   Future<Response> getTransactionsByLan(String lan) async {
     return await get(
       AppConstants.transactionsEndpoint,
@@ -217,7 +217,7 @@ class ApiService {
   }
 
   /// Get transaction detail with allocation
-  /// GET /customers/transaction-detail?lan={lan}&utr={utr}
+  /// GET /lms-customers/transaction-detail?lan={lan}&utr={utr}
   Future<Response> getTransactionDetail(String lan, String utr) async {
     return await get(
       AppConstants.transactionDetailEndpoint,
@@ -226,7 +226,7 @@ class ApiService {
   }
 
   /// Get lender types (LAN)
-  /// GET /customers/lan
+  /// GET /lms-customers/lan
   Future<Response> getLenderTypes() async {
     return await get(AppConstants.lenderTypesEndpoint);
   }
@@ -250,7 +250,7 @@ class ApiService {
   }
 
   /// Get invoice details by lender
-  /// GET /customers/invoice-details?lender={lender}
+  /// GET /lms-customers/invoice-details?lender={lender}
   Future<Response> getInvoiceDetails(String lender) async {
     return await get(
       AppConstants.invoiceDetailsEndpoint,
@@ -298,8 +298,8 @@ class _AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     // Skip auth for login/otp endpoints
-    if (options.path.contains('/customers/login') ||
-        options.path.contains('/customers/password')) {
+    if (options.path.contains('/lms-customers/login') ||
+        options.path.contains('/lms-customers/password')) {
       return handler.next(options);
     }
     

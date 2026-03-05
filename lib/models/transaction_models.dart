@@ -86,7 +86,7 @@ class Transaction {
   bool get isDebit => type == 'REPAYMENT' || type == 'INTEREST' || type == 'PROCESSING_FEE';
 }
 
-/// Collection Transaction model for /customers/transactions/by-lan API
+/// Collection Transaction model for /lms-customers/transactions/by-lan API
 /// Response format: { "success": true, "data": [{ "collection_date": "...", "collection_amount": ..., "collection_utr": "..." }] }
 class CollectionTransaction {
   final DateTime collectionDate;
@@ -212,7 +212,7 @@ class TransactionReceipt {
 }
 
 /// Transaction Detail with Allocation data
-/// GET /customers/transaction-detail?lan={lan}&utr={utr}
+/// GET /lms-customers/transaction-detail?lan={lan}&utr={utr}
 class TransactionDetail {
   final String lan;
   final String collectionUtr;
