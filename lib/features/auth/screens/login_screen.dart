@@ -88,10 +88,10 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 60),
                 // Logo and Title
-                Icon(
-                  Icons.account_balance,
-                  size: 80,
-                  color: AppColors.primaryBlue,
+                Image.asset(
+                  'assets/icon/app_icon.png',
+                  width: 80,
+                  height: 80,
                 ),
                 const SizedBox(height: 24),
                 Text(
