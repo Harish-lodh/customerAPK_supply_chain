@@ -14,6 +14,7 @@ import '../features/loans/screens/loan_detail_screen.dart';
 import '../features/transactions/screens/transactions_screen.dart';
 import '../features/notifications/screens/notifications_screen.dart';
 import '../features/profile/screens/profile_screen.dart';
+import '../features/profile/screens/privacy_policy_screen.dart';
 import '../core/widgets/main_scaffold.dart';
 
 class AppRouter {
@@ -138,6 +139,12 @@ class AppRouter {
       GoRoute(
         path: '/notifications',
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      
+      // Privacy Policy
+      GoRoute(
+        path: '/privacy-policy',
+        builder: (context, state) => const PrivacyPolicyScreen(),
       ),
     ],
   );

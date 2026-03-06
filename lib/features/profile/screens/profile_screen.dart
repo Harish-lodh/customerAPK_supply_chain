@@ -106,6 +106,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 24),
 
+                // Privacy Policy Button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      context.push('/privacy-policy');
+                    },
+                    icon: const Icon(Icons.privacy_tip_outlined),
+                    label: const Text('Privacy Policy'),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 // Logout Button
                 SizedBox(
                   width: double.infinity,
