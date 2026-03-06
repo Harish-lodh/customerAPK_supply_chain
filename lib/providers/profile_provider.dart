@@ -64,8 +64,8 @@ class ProfileProvider extends ChangeNotifier {
             mobileNumber: profileData['mobile'] ?? '',
             panNumber: profileData['pan'],
             gstNumber: profileData['gstNumber'],
-            address: profileData['addresses']?.isNotEmpty == true 
-                ? profileData['addresses'][0]['fullAddress'] 
+            address: profileData['applicant_address']?.isNotEmpty == true 
+                ? profileData['applicant_address'] 
                 : null,
             city: profileData['addresses']?.isNotEmpty == true 
                 ? profileData['addresses'][0]['city'] 

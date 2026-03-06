@@ -242,16 +242,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            'Next EMI',
-            dashboard.nextEmiDate != null 
-                ? dateFormat.format(dashboard.nextEmiDate!)
-                : 'N/A',
-            Icons.calendar_today,
-            AppColors.info,
-          ),
-        ),
+        // Expanded(
+        //   child: _buildStatCard(
+        //     'Next EMI',
+        //     dashboard.nextEmiDate != null 
+        //         ? dateFormat.format(dashboard.nextEmiDate!)
+        //         : 'N/A',
+        //     Icons.calendar_today,
+        //     AppColors.info,
+        //   ),
+        // ),
       ],
     );
   }
@@ -424,11 +424,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Icons.payment,
           () => context.go('/loans'),
         ),
-        _buildActionCard(
-          'Foreclosure',
-          Icons.cancel_outlined,
-          () => context.go('/loans'),
-        ),
+        // _buildActionCard(
+        //   'Foreclosure',
+        //   Icons.cancel_outlined,
+        //   () => context.go('/loans'),
+        // ),
       ],
     );
   }

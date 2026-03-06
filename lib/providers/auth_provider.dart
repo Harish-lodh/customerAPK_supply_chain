@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 import '../core/services/api_service.dart';
 import '../core/services/secure_storage_service.dart';
 import '../core/services/session_service.dart';
@@ -70,36 +71,43 @@ class AuthProvider extends ChangeNotifier {
   }
   
   // Request OTP for login
-  Future<bool> requestOtp(String mobileNumber) async {
-    _state = AuthState.loading;
-    _errorMessage = null;
-    notifyListeners();
-    
-    try {
-      final response = await apiService.post(
-        '/lms-customers/login/otp',
-        data: {'mobile': mobileNumber},
-      );
-      
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        _isOtpSent = true;
-        _pendingMobileNumber = mobileNumber;
-        _state = AuthState.unauthenticated;
-        notifyListeners();
-        return true;
-      } else {
-        _errorMessage = response.data?['message'] ?? 'Failed to send OTP';
-        _state = AuthState.error;
-        notifyListeners();
-        return false;
-      }
-    } catch (e) {
-      _errorMessage = 'Failed to send OTP. Please try again.';
+Future<bool> requestOtp(String mobileNumber) async {
+  _state = AuthState.loading;
+  _errorMessage = null;
+  notifyListeners();
+
+  try {
+    final response = await apiService.post(
+      '/lms-customers/login/otp',
+      data: {'mobile': mobileNumber},
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      _isOtpSent = true;
+      _pendingMobileNumber = mobileNumber;
+      _state = AuthState.unauthenticated;
+      notifyListeners();
+      return true;
+    } else {
+      _errorMessage = response.data?['message'] ?? 'Failed to send OTP';
       _state = AuthState.error;
       notifyListeners();
       return false;
     }
+
+  } on DioException catch (e) {
+    _errorMessage = e.response?.data?['message'] ?? 'Failed to send OTP';
+    _state = AuthState.error;
+    notifyListeners();
+    return false;
+
+  } catch (e) {
+    _errorMessage = 'Something went wrong';
+    _state = AuthState.error;
+    notifyListeners();
+    return false;
   }
+}
   
   // Send OTP (alias for requestOtp)
   Future<bool> sendOtp(String mobileNumber) => requestOtp(mobileNumber);

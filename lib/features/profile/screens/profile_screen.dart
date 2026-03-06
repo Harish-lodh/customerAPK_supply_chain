@@ -63,26 +63,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Bank Details
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Bank Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        const Divider(),
-                        if (bank != null) ...[
-                          _buildProfileRow('Bank Name', bank.bankName),
-                          _buildProfileRow('Branch', bank.branchName),
-                          _buildProfileRow('Account Number', bank.maskedAccountNumber),
-                          _buildProfileRow('IFSC Code', bank.ifscCode),
-                          _buildProfileRow('Account Type', bank.accountType),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
+                // // Bank Details
+                // Card(
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(16),
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         const Text('Bank Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                //         const Divider(),
+                //         if (bank != null) ...[
+                //           _buildProfileRow('Bank Name', bank.bankName),
+                //           _buildProfileRow('Branch', bank.branchName),
+                //           _buildProfileRow('Account Number', bank.maskedAccountNumber),
+                //           _buildProfileRow('IFSC Code', bank.ifscCode),
+                //           _buildProfileRow('Account Type', bank.accountType),
+                //         ],
+                //       ],
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 16),
 
                 // Support Contact
