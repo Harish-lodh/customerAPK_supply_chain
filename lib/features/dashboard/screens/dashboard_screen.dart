@@ -46,7 +46,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(dashboardProvider.errorMessage ?? 'Error loading dashboard'),
+                  Text(dashboardProvider.errorMessage ??
+                      'Error loading dashboard'),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => dashboardProvider.loadDashboard(),
@@ -73,15 +74,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   // Limit Card
                   _buildLimitCard(dashboard),
                   const SizedBox(height: 16),
-                  
+
                   // Quick Stats
                   _buildQuickStats(dashboard),
                   const SizedBox(height: 24),
-                  
+
                   // Total Loans and Disbursed
                   _buildLoanSummary(dashboard),
                   const SizedBox(height: 24),
-                  
+
                   // Recent Repayments
                   if (dashboard.recentRepayments.isNotEmpty) ...[
                     Text(
@@ -92,7 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     _buildRecentRepayments(dashboard),
                     const SizedBox(height: 24),
                   ],
-                  
+
                   // Quick Actions
                   Text(
                     'Quick Actions',
@@ -111,7 +112,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildLimitCard(Dashboard dashboard) {
     final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -124,11 +125,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   'Credit Limit',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                        color: AppColors.textSecondary,
+                      ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.success.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
@@ -173,8 +175,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildLegendItem('Utilized', currencyFormat.format(dashboard.utilizedAmount), AppColors.primaryBlue),
-                _buildLegendItem('Available', currencyFormat.format(dashboard.availableLimit), AppColors.chartGreen),
+                _buildLegendItem(
+                    'Utilized',
+                    currencyFormat.format(dashboard.utilizedAmount),
+                    AppColors.primaryBlue),
+                _buildLegendItem(
+                    'Available',
+                    currencyFormat.format(dashboard.availableLimit),
+                    AppColors.chartGreen),
               ],
             ),
           ],
@@ -221,7 +229,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildQuickStats(Dashboard dashboard) {
     final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
     final dateFormat = DateFormat('dd MMM yyyy');
-    
+
     return Row(
       children: [
         Expanded(
@@ -245,7 +253,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         // Expanded(
         //   child: _buildStatCard(
         //     'Next EMI',
-        //     dashboard.nextEmiDate != null 
+        //     dashboard.nextEmiDate != null
         //         ? dateFormat.format(dashboard.nextEmiDate!)
         //         : 'N/A',
         //     Icons.calendar_today,
@@ -256,57 +264,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildLoanSummary(Dashboard dashboard) {
-    final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
-    
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Loan Summary',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildSummaryItem(
+Widget _buildLoanSummary(Dashboard dashboard) {
+  final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
+
+  return Card(
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Loan Summary',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Use 1 column on very small screens, 3 on wider screens
+              final isNarrow = constraints.maxWidth < 360;
+              final crossAxisCount = isNarrow ? 1 : 3;
+              final childAspectRatio = isNarrow ? 3.5 : 0.9;
+
+              return GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: childAspectRatio,
+                children: [
+                  _buildSummaryItem(
                     'Total Loans',
                     dashboard.totalLoans.toString(),
                     Icons.assignment,
                     AppColors.primaryBlue,
                   ),
-                ),
-                Expanded(
-                  child: _buildSummaryItem(
+                  _buildSummaryItem(
                     'Total Disbursed',
                     currencyFormat.format(dashboard.totalDisbursed),
                     Icons.payments,
                     AppColors.success,
                   ),
-                ),
-                Expanded(
-                  child: _buildSummaryItem(
-                    'Outstanding',
+                  _buildSummaryItem(
+                    'Total Outstanding',
                     currencyFormat.format(dashboard.totalOutstanding),
                     Icons.account_balance_wallet,
                     AppColors.warning,
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildSummaryItem(String title, String value, IconData icon, Color color) {
+  Widget _buildSummaryItem(
+      String title, String value, IconData icon, Color color) {
     return Column(
       children: [
         Icon(icon, color: color, size: 28),
@@ -335,7 +353,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildRecentRepayments(Dashboard dashboard) {
     final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 2);
     final dateFormat = DateFormat('dd MMM yyyy');
-    
+
     return Card(
       child: ListView.separated(
         shrinkWrap: true,
@@ -370,7 +388,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),

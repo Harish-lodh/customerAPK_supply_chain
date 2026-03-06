@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import '../features/auth/screens/login_screen.dart';
+import '../features/auth/screens/splash_screen.dart';
 import '../features/auth/screens/otp_screen.dart';
 import '../features/auth/screens/register_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
@@ -23,24 +24,27 @@ class AppRouter {
   
   late final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/login',
+    initialLocation: '/splash',
     debugLogDiagnostics: true,
     redirect: (context, state) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final isLoggedIn = authProvider.isAuthenticated;
       final isLoggingIn = state.uri.path == '/login';
+      final isSplash = state.uri.path == '/splash';
       final isOtpRoute = state.uri.path == '/otp';
       final isRegisterRoute = state.uri.path == '/register';
       
-      // Allow OTP and Register routes only when coming from login
-      if (isOtpRoute || isRegisterRoute) {
+      // Allow splash, OTP and Register routes
+      if (isSplash || isOtpRoute || isRegisterRoute) {
         return null;
       }
       
+      // If not logged in and not on login/otp/register, redirect to login
       if (!isLoggedIn && !isLoggingIn) {
         return '/login';
       }
       
+      // If logged in and on login page, redirect to dashboard
       if (isLoggedIn && isLoggingIn) {
         return '/dashboard';
       }
@@ -48,6 +52,12 @@ class AppRouter {
       return null;
     },
     routes: [
+      // Splash Screen Route
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      
       // Login Route
       GoRoute(
         path: '/login',

@@ -27,9 +27,9 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider({
     required this.apiService,
     required this.secureStorage,
-  }) {
-    _checkAuthStatus();
-  }
+  });
+  
+  // Initialize auth state - called from SplashScreen
   
   // Getters
   AuthState get state => _state;
@@ -38,21 +38,27 @@ class AuthProvider extends ChangeNotifier {
   bool get isOtpSent => _isOtpSent;
   bool get isAuthenticated => _state == AuthState.authenticated;
   String? get pendingMobileNumber => _pendingMobileNumber;
+  bool get isLoading => _state == AuthState.loading;
   
-  // Check if user is already logged in
-  Future<void> _checkAuthStatus() async {
+  // Load stored session from SessionService (called from SplashScreen)
+  Future<void> loadStoredSession() async {
     try {
-      // Use SessionService for checking login status
+      _state = AuthState.loading;
+      notifyListeners();
+
       final isLoggedIn = await SessionService.isLoggedIn();
       
       if (isLoggedIn) {
-        _state = AuthState.authenticated;
         // Load user data from SessionService
         final customerId = await SessionService.getCustomerId();
         final customerName = await SessionService.getCustomerName();
         final companyName = await SessionService.getCompanyName();
+        final token = await SessionService.getToken();
         
-        if (customerId != null && customerName != null && companyName != null) {
+        if (customerId != null && customerName != null && companyName != null && token != null) {
+          // Set token in secure storage for API calls
+          await secureStorage.setAccessToken(token);
+          
           _user = User(
             id: customerId.toString(),
             mobileNumber: '',
@@ -60,6 +66,53 @@ class AuthProvider extends ChangeNotifier {
             email: '',
             createdAt: DateTime.now(),
           );
+          _state = AuthState.authenticated;
+        } else {
+          _state = AuthState.unauthenticated;
+        }
+      } else {
+        _state = AuthState.unauthenticated;
+      }
+    } catch (e) {
+      _state = AuthState.unauthenticated;
+    }
+    notifyListeners();
+  }
+
+  // Set unauthenticated state
+  void setUnauthenticated() {
+    _state = AuthState.unauthenticated;
+    _user = null;
+    notifyListeners();
+  }
+  
+  // Check auth status manually (can be called for refresh)
+  Future<void> checkAuthStatus() async {
+    try {
+      // Use SessionService for checking login status
+      final isLoggedIn = await SessionService.isLoggedIn();
+      
+      if (isLoggedIn) {
+        // Load user data from SessionService
+        final customerId = await SessionService.getCustomerId();
+        final customerName = await SessionService.getCustomerName();
+        final companyName = await SessionService.getCompanyName();
+        final token = await SessionService.getToken();
+        
+        if (customerId != null && customerName != null && companyName != null && token != null) {
+          // Set token in secure storage for API calls
+          await secureStorage.setAccessToken(token);
+          
+          _user = User(
+            id: customerId.toString(),
+            mobileNumber: '',
+            companyName: companyName,
+            email: '',
+            createdAt: DateTime.now(),
+          );
+          _state = AuthState.authenticated;
+        } else {
+          _state = AuthState.unauthenticated;
         }
       } else {
         _state = AuthState.unauthenticated;
@@ -71,44 +124,44 @@ class AuthProvider extends ChangeNotifier {
   }
   
   // Request OTP for login
-Future<bool> requestOtp(String mobileNumber) async {
-  _state = AuthState.loading;
-  _errorMessage = null;
-  notifyListeners();
+ Future<bool> requestOtp(String mobileNumber) async {
+   _state = AuthState.loading;
+   _errorMessage = null;
+   notifyListeners();
 
-  try {
-    final response = await apiService.post(
-      '/lms-customers/login/otp',
-      data: {'mobile': mobileNumber},
-    );
+   try {
+     final response = await apiService.post(
+       '/lms-customers/login/otp',
+       data: {'mobile': mobileNumber},
+     );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      _isOtpSent = true;
-      _pendingMobileNumber = mobileNumber;
-      _state = AuthState.unauthenticated;
-      notifyListeners();
-      return true;
-    } else {
-      _errorMessage = response.data?['message'] ?? 'Failed to send OTP';
-      _state = AuthState.error;
-      notifyListeners();
-      return false;
-    }
+     if (response.statusCode == 200 || response.statusCode == 201) {
+       _isOtpSent = true;
+       _pendingMobileNumber = mobileNumber;
+       _state = AuthState.unauthenticated;
+       notifyListeners();
+       return true;
+     } else {
+       _errorMessage = response.data?['message'] ?? 'Failed to send OTP';
+       _state = AuthState.error;
+       notifyListeners();
+       return false;
+     }
 
-  } on DioException catch (e) {
-    _errorMessage = e.response?.data?['message'] ?? 'Failed to send OTP';
-    _state = AuthState.error;
-    notifyListeners();
-    return false;
+   } on DioException catch (e) {
+     _errorMessage = e.response?.data?['message'] ?? 'Failed to send OTP';
+     _state = AuthState.error;
+     notifyListeners();
+     return false;
 
-  } catch (e) {
-    _errorMessage = 'Something went wrong';
-    _state = AuthState.error;
-    notifyListeners();
-    return false;
-  }
-}
-  
+   } catch (e) {
+     _errorMessage = 'Something went wrong';
+     _state = AuthState.error;
+     notifyListeners();
+     return false;
+   }
+ }
+   
   // Send OTP (alias for requestOtp)
   Future<bool> sendOtp(String mobileNumber) => requestOtp(mobileNumber);
   
