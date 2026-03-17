@@ -10,6 +10,7 @@ import '../features/auth/screens/register_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
 import '../features/invoice/screens/invoice_list_screen.dart';
 import '../features/invoice/screens/invoice_detail_screen.dart';
+import '../features/invoice/screens/pending_approval_list_screen.dart';
 import '../features/loans/screens/loans_screen.dart';
 import '../features/loans/screens/loan_detail_screen.dart';
 import '../features/transactions/screens/transactions_screen.dart';
@@ -134,6 +135,12 @@ class AppRouter {
           final invoiceId = state.pathParameters['invoiceId']!;
           return InvoiceDetailScreen(invoiceId: invoiceId);
         },
+      ),
+      
+      // Pending Approvals
+      GoRoute(
+        path: '/pending-approvals',
+        builder: (context, state) => const PendingApprovalListScreen(),
       ),
       
       // Loan Detail

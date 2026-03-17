@@ -28,6 +28,10 @@ class AppConstants {
   // Invoice Details Endpoint
   static const String invoiceDetailsEndpoint = '/lms-customers/invoice-details';
   
+  // Invoice Approval Endpoints
+  static const String pendingApprovalInvoicesEndpoint = '/lms-customers/invoices/pending-approval';
+  static const String invoiceApprovalEndpoint = '/lms-customers/invoices';
+  
   // Storage Keys
   static const String accessTokenKey = 'access_token';
   static const String refreshTokenKey = 'refresh_token';

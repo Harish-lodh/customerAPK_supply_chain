@@ -281,6 +281,36 @@ class ApiService {
       ),
     );
   }
+  
+  /// Get invoices pending customer approval
+  /// GET /customer-apk/invoices/pending-approval
+  Future<Response> getPendingApprovalInvoices() async {
+    return await get(AppConstants.pendingApprovalInvoicesEndpoint);
+  }
+  
+  /// Get invoice details for customer approval
+  /// GET /customer-apk/invoices/{invoiceId}
+  Future<Response> getInvoiceById(int invoiceId) async {
+    return await get('${AppConstants.invoiceApprovalEndpoint}/$invoiceId');
+  }
+  
+  /// Customer approves an invoice
+  /// POST /customer-apk/invoices/{invoiceId}/approve
+  Future<Response> approveInvoice(int invoiceId, String remarks) async {
+    return await post(
+      '${AppConstants.invoiceApprovalEndpoint}/$invoiceId/approve',
+      data: {'remarks': remarks},
+    );
+  }
+  
+  /// Customer rejects an invoice
+  /// POST /customer-apk/invoices/{invoiceId}/reject
+  Future<Response> rejectInvoice(int invoiceId, String remarks) async {
+    return await post(
+      '${AppConstants.invoiceApprovalEndpoint}/$invoiceId/reject',
+      data: {'remarks': remarks},
+    );
+  }
 }
 
 class _AuthInterceptor extends Interceptor {

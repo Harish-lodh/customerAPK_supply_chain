@@ -367,3 +367,255 @@ class InvoiceDetailsResponse {
     );
   }
 }
+
+// Pending Approval Invoice Model
+class PendingApprovalInvoice {
+  final int id;
+  final int customerId;
+  final int loanAccountId;
+  final int supplierId;
+  final String invoiceNumber;
+  final DateTime invoiceDate;
+  final double invoiceAmount;
+  final double disbursementAmount;
+  final DateTime? dueDate;
+  final String? description;
+  final String? invoiceFilePath;
+  final String status;
+  final String? disbursementUtr;
+  final DateTime? disbursementDate;
+  final DateTime? invoiceDueDate;
+  final double? roiPercentage;
+  final double? roiAmount;
+  final double? emiAmount;
+  final String? customerApprovalStatus;
+  final String? customerRemarks;
+  final DateTime? customerApprovedAt;
+  final int? approvedByCustomerId;
+  final double? disbursedAmount;
+  final DateTime? disbursedDate;
+  final int createdByUserId;
+  final String? rejectionReason;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  
+  // Related entities
+  final SupplierInfo? supplier;
+  final LoanAccountInfo? loanAccount;
+  
+  PendingApprovalInvoice({
+    required this.id,
+    required this.customerId,
+    required this.loanAccountId,
+    required this.supplierId,
+    required this.invoiceNumber,
+    required this.invoiceDate,
+    required this.invoiceAmount,
+    required this.disbursementAmount,
+    this.dueDate,
+    this.description,
+    this.invoiceFilePath,
+    required this.status,
+    this.disbursementUtr,
+    this.disbursementDate,
+    this.invoiceDueDate,
+    this.roiPercentage,
+    this.roiAmount,
+    this.emiAmount,
+    this.customerApprovalStatus,
+    this.customerRemarks,
+    this.customerApprovedAt,
+    this.approvedByCustomerId,
+    this.disbursedAmount,
+    this.disbursedDate,
+    required this.createdByUserId,
+    this.rejectionReason,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+    this.supplier,
+    this.loanAccount,
+  });
+  
+  factory PendingApprovalInvoice.fromJson(Map<String, dynamic> json) {
+    return PendingApprovalInvoice(
+      id: json['id'] ?? 0,
+      customerId: json['customerId'] ?? 0,
+      loanAccountId: json['loanAccountId'] ?? 0,
+      supplierId: json['supplierId'] ?? 0,
+      invoiceNumber: json['invoiceNumber'] ?? '',
+      invoiceDate: DateTime.tryParse(json['invoiceDate'] ?? '') ?? DateTime.now(),
+      invoiceAmount: _parseDouble(json['invoiceAmount']),
+      disbursementAmount: _parseDouble(json['disbursementAmount']),
+      dueDate: json['dueDate'] != null ? DateTime.tryParse(json['dueDate']) : null,
+      description: json['description'],
+      invoiceFilePath: json['invoiceFilePath'],
+      status: json['status'] ?? '',
+      disbursementUtr: json['disbursementUtr'],
+      disbursementDate: json['disbursementDate'] != null ? DateTime.tryParse(json['disbursementDate']) : null,
+      invoiceDueDate: json['invoiceDueDate'] != null ? DateTime.tryParse(json['invoiceDueDate']) : null,
+      roiPercentage: _parseDoubleNullable(json['roiPercentage']),
+      roiAmount: _parseDoubleNullable(json['roiAmount']),
+      emiAmount: _parseDoubleNullable(json['emiAmount']),
+      customerApprovalStatus: json['customerApprovalStatus'],
+      customerRemarks: json['customerRemarks'],
+      customerApprovedAt: json['customerApprovedAt'] != null ? DateTime.tryParse(json['customerApprovedAt']) : null,
+      approvedByCustomerId: json['approvedByCustomerId'],
+      disbursedAmount: _parseDoubleNullable(json['disbursedAmount']),
+      disbursedDate: json['disbursedDate'] != null ? DateTime.tryParse(json['disbursedDate']) : null,
+      createdByUserId: json['createdByUserId'] ?? 0,
+      rejectionReason: json['rejectionReason'],
+      isActive: json['isActive'] ?? true,
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
+      supplier: json['supplier'] != null ? SupplierInfo.fromJson(json['supplier']) : null,
+      loanAccount: json['loanAccount'] != null ? LoanAccountInfo.fromJson(json['loanAccount']) : null,
+    );
+  }
+  
+  // Helper method to parse double from various formats
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+  
+  // Helper method to parse nullable double
+  static double? _parseDoubleNullable(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
+  
+  String get statusDisplay {
+    switch (status.toUpperCase()) {
+      case 'PENDING_CUSTOMER_APPROVAL':
+        return 'Pending Approval';
+      case 'PENDING':
+        return 'Pending';
+      case 'APPROVED':
+        return 'Approved';
+      case 'REJECTED':
+        return 'Rejected';
+      case 'DISBURSED':
+        return 'Disbursed';
+      case 'CLOSED':
+        return 'Closed';
+      default:
+        return status;
+    }
+  }
+  
+  bool get needsApproval => status.toUpperCase() == 'PENDING_CUSTOMER_APPROVAL';
+  
+  String get supplierName => supplier?.supplierName ?? 'N/A';
+  String get lender => loanAccount?.lender ?? 'N/A';
+  String get lan => loanAccount?.lanId ?? 'N/A';
+}
+
+// Supplier Info Model
+class SupplierInfo {
+  final int id;
+  final int customerId;
+  final String supplierName;
+  final String supplierCode;
+  final String? email;
+  final String contactNumber;
+  final String? address;
+  final String? gstNumber;
+  final String? panNumber;
+  final String status;
+  
+  SupplierInfo({
+    required this.id,
+    required this.customerId,
+    required this.supplierName,
+    required this.supplierCode,
+    this.email,
+    required this.contactNumber,
+    this.address,
+    this.gstNumber,
+    this.panNumber,
+    required this.status,
+  });
+  
+  factory SupplierInfo.fromJson(Map<String, dynamic> json) {
+    return SupplierInfo(
+      id: json['id'] ?? 0,
+      customerId: json['customerId'] ?? 0,
+      supplierName: json['supplierName'] ?? '',
+      supplierCode: json['supplierCode'] ?? '',
+      email: json['email'],
+      contactNumber: json['contactNumber'] ?? '',
+      address: json['address'],
+      gstNumber: json['gstNumber'],
+      panNumber: json['panNumber'],
+      status: json['status'] ?? '',
+    );
+  }
+}
+
+// Loan Account Info Model
+class LoanAccountInfo {
+  final int id;
+  final int customerId;
+  final int partnerId;
+  final String lender;
+  final String lanId;
+  final double sanctionedAmount;
+  final double disbursedAmount;
+  final String status;
+  
+  LoanAccountInfo({
+    required this.id,
+    required this.customerId,
+    required this.partnerId,
+    required this.lender,
+    required this.lanId,
+    required this.sanctionedAmount,
+    required this.disbursedAmount,
+    required this.status,
+  });
+  
+  factory LoanAccountInfo.fromJson(Map<String, dynamic> json) {
+    return LoanAccountInfo(
+      id: json['id'] ?? 0,
+      customerId: json['customerId'] ?? 0,
+      partnerId: json['partnerId'] ?? 0,
+      lender: json['lender'] ?? '',
+      lanId: json['lanId'] ?? '',
+      sanctionedAmount: double.tryParse(json['sanctionedAmount']?.toString() ?? '0') ?? 0,
+      disbursedAmount: double.tryParse(json['disbursedAmount']?.toString() ?? '0') ?? 0,
+      status: json['status'] ?? '',
+    );
+  }
+}
+
+// Approval Result Model
+class ApprovalResult {
+  final bool success;
+  final String message;
+  final int invoiceId;
+  final String status;
+  
+  ApprovalResult({
+    required this.success,
+    required this.message,
+    required this.invoiceId,
+    required this.status,
+  });
+  
+  factory ApprovalResult.fromJson(Map<String, dynamic> json) {
+    return ApprovalResult(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      invoiceId: json['invoice_id'] ?? 0,
+      status: json['status'] ?? '',
+    );
+  }
+}

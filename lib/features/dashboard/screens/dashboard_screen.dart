@@ -434,6 +434,11 @@ Widget _buildLoanSummary(Dashboard dashboard) {
           () => context.go('/invoices'),
         ),
         _buildActionCard(
+          'Pending Approvals',
+          Icons.pending_actions,
+          () => context.push('/pending-approvals'),
+        ),
+        _buildActionCard(
           'View Statement',
           Icons.description,
           () => context.go('/transactions'),
