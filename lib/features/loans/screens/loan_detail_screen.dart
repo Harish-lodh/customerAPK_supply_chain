@@ -71,7 +71,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text('EMI Schedule (Till Today)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text('EMI Schedule', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 12),
                 if (provider.emiScheduleResponse.isEmpty)
                   const Card(

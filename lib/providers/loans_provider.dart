@@ -91,18 +91,7 @@ class LoansProvider extends ChangeNotifier {
             .map((json) => EmiScheduleResponse.fromJson(json))
             .toList();
         
-        // Filter to show only EMI schedule till today (2026-02-27)
-        final now = DateTime.now();
-        final today = DateTime(now.year, now.month, now.day);
-        
-        _emiScheduleResponse = schedules.where((schedule) {
-          final dueDate = DateTime(
-            schedule.invoiceDueDate.year,
-            schedule.invoiceDueDate.month,
-            schedule.invoiceDueDate.day,
-          );
-          return dueDate.isBefore(today) || dueDate.isAtSameMomentAs(today);
-        }).toList();
+        _emiScheduleResponse = schedules;
         
         // Sort by due date (most recent first)
         _emiScheduleResponse.sort((a, b) => b.invoiceDueDate.compareTo(a.invoiceDueDate));
